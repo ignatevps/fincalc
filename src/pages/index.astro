@@ -1,17 +1,49 @@
 ---
+import '../styles/index.css';
+import BaseLayout from "../layouts/BaseLayout.astro"
 
+const calculators = [
+  {
+    path: "/calculators/inflation",
+    icon: "/icons/inflation.svg",
+    title: "Инфляция",
+    description: "Насколько обесценились деньги",
+  },
+  {
+    path: "/calculators/deposit",
+    icon: "/icons/deposit.svg",
+    title: "Вклад",
+    description: "Сколько заработаете на вкладе",
+  },
+  {
+    path: "/calculators/credit",
+    icon: "/icons/credit.svg",
+    title: "Кредит",
+    description: "Ежемесячный платёж и переплата",
+  },
+  {
+    path: "/calculators/mortgage",
+    icon: "/icons/mortgage.svg",
+    title: "Ипотека",
+    description: "Расчёт с досрочными погашениями",
+  },
+];
 ---
-
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout title="Финансовые калькуляторы" description="Бесплатные финансовые калькуляторы: инфляция, вклад, кредит,      
+  ипотека">
+  <div class="home">
+    <h1 class="title">Финансовые калькуляторы</h1>
+    <div class="calc-list">
+        {calculators.map((calc) => (
+        <a href={calc.path} class="calc-card">
+          <img src={calc.icon} alt="" width={28} height={28} />
+          <div class="calc-info">
+            <span class="calc-name">{calc.title}</span>
+            <span class="calc-desc">{calc.description}</span>
+          </div>
+          <span class="calc-arrow">›</span>
+        </a>
+        ))}
+    </div>
+  </div>
+</BaseLayout> 

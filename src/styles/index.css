@@ -1,0 +1,59 @@
+.home {
+  padding: 48px 0 32px;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.calc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.calc-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 16px;
+  transition: background 0.15s;
+}
+
+.calc-card:active {
+  background: #2a2a2a;
+}
+.calc-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.calc-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.calc-name {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.calc-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.calc-arrow {
+  font-size: 22px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
