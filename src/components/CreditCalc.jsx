@@ -43,64 +43,76 @@ export default function Credit() {
     <div className="calc-wrapper">
       <a href="/">Назад</a>
       <h1 className="calc-title">Кредитный калькулятор</h1>
-      <form>
-        <label htmlFor="amount">Сумма кредита/займа: </label>
-        <input
-          type="number"
-          step="any"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          name="amount"
-          id="amount"
-          required
-        />
-        <label htmlFor="rate">Процентная ставка, % годовых: </label>
-        <input
-          type="number"
-          step="0.1"
-          value={rate}
-          onChange={(e) => setRate(e.target.value)}
-          name="rate"
-          id="rate"
-          required
-        />
-        <label htmlFor="term">Срок кредита/займа: </label>
-        <input
-          type="number"
-          step="1"
-          value={term}
-          onChange={(e) => setTerm(e.target.value)}
-          name="term"
-          id="term"
-          required
-        />
-        <select
-          name="termUnit"
-          value={termUnit}
-          onChange={(e) => setTermUnit(e.target.value)}
-        >
-          <option value="years">Лет</option>
-          <option value="months">Месяцев</option>
-        </select>
-        <label htmlFor="issueDate">Дата выдачи: </label>
-        <input
-          type="date"
-          value={issueDate}
-          onChange={(e) => setIssueDate(e.target.value)}
-          name="issueDate"
-          id="issueDate"
-          required
-        />
-        <label htmlFor="paymentType">Порядок погашения: </label>
-        <select
-          name="paymentType"
-          value={paymentType}
-          onChange={(e) => setPaymentType(e.target.value)}
-        >
-          <option value="annuity">Аннуитетный</option>
-          <option value="differentiated">Дифференцированный</option>
-        </select>
-      </form>
+      <div>
+        <div className="field">
+          <label htmlFor="amount">Сумма кредита/займа: </label>
+          <input
+            type="number"
+            step="any"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            name="amount"
+            id="amount"
+            required
+          />
+        </div>
+        <div className="field">
+          <label htmlFor="rate">Процентная ставка, % годовых: </label>
+          <input
+            type="number"
+            step="0.1"
+            value={rate}
+            onChange={(e) => setRate(e.target.value)}
+            name="rate"
+            id="rate"
+            required
+          />
+        </div>
+        <div className="field">
+          <label htmlFor="term">Срок кредита/займа: </label>
+          <div className="field-row">
+            <input
+              type="number"
+              step="1"
+              value={term}
+              onChange={(e) => setTerm(e.target.value)}
+              name="term"
+              id="term"
+              required
+            />
+            <select
+              name="termUnit"
+              value={termUnit}
+              onChange={(e) => setTermUnit(e.target.value)}
+            >
+              <option value="years">Лет</option>
+              <option value="months">Месяцев</option>
+            </select>
+          </div>
+        </div>
+        <div className="field">
+          <label htmlFor="issueDate">Дата выдачи: </label>
+          <input
+            type="date"
+            value={issueDate}
+            onChange={(e) => setIssueDate(e.target.value)}
+            name="issueDate"
+            id="issueDate"
+            required
+          />
+        </div>
+        <div className="field">
+          <label htmlFor="paymentType">Порядок погашения: </label>
+          <select
+            name="paymentType"
+            value={paymentType}
+            onChange={(e) => setPaymentType(e.target.value)}
+          >
+            <option value="annuity">Аннуитетный</option>
+            <option value="differentiated">Дифференцированный</option>
+          </select>
+        </div>
+      </div>
       <div>
         {paymentType === "annuity" ? (
           <p>

@@ -49,90 +49,108 @@ export default function Mortgage() {
     <div className="calc-wrapper">
       <a href="/">Назад</a>
       <h1 className="calc-title">Калькулятор ипотеки</h1>
-      <form>
-        <label htmlFor="propertyPrice">Стоимость недвижимости: </label>
-        <input
-          type="number"
-          step="any"
-          value={propertyPrice}
-          onChange={(e) => setPropertyPrice(e.target.value)}
-          name="propertyPrice"
-          id="propertyPrice"
-          required
-        />
-        <label htmlFor="downPayment">Первоначальный взнос: </label>
-        <input
-          type="number"
-          step="any"
-          value={downPayment}
-          onChange={(e) => setDownPayment(e.target.value)}
-          name="downPayment"
-          id="downPayment"
-          required
-        />
-        <select
-          name="downPaymentUnit"
-          value={downPaymentUnit}
-          onChange={(e) => setDownPaymentUnit(e.target.value)}
-        >
-          <option value="rub">₽</option>
-          <option value="percent">%</option>
-        </select>
-        <label htmlFor="rate">Процентная ставка, % годовых: </label>
-        <input
-          type="number"
-          step="0.1"
-          value={rate}
-          onChange={(e) => setRate(e.target.value)}
-          name="rate"
-          id="rate"
-          required
-        />
-        <p>
-          Сумма кредита:{" "}
-          {loanAmount.toLocaleString("ru-RU", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}{" "}
-          ₽
-        </p>
-        <label htmlFor="term">Срок кредита/займа: </label>
-        <input
-          type="number"
-          step="1"
-          value={term}
-          onChange={(e) => setTerm(e.target.value)}
-          name="term"
-          id="term"
-          required
-        />
-        <select
-          name="termUnit"
-          value={termUnit}
-          onChange={(e) => setTermUnit(e.target.value)}
-        >
-          <option value="years">Лет</option>
-          <option value="months">Месяцев</option>
-        </select>
-        <label htmlFor="issueDate">Дата выдачи: </label>
-        <input
-          type="date"
-          value={issueDate}
-          onChange={(e) => setIssueDate(e.target.value)}
-          name="issueDate"
-          id="issueDate"
-          required
-        />
-        <label htmlFor="paymentType">Порядок погашения: </label>
-        <select
-          name="paymentType"
-          value={paymentType}
-          onChange={(e) => setPaymentType(e.target.value)}
-        >
-          <option value="annuity">Аннуитетный</option>
-          <option value="differentiated">Дифференцированный</option>
-        </select>
-      </form>
+      <div>
+        <div className="field">
+          <label htmlFor="propertyPrice">Стоимость недвижимости: </label>
+          <input
+            type="number"
+            step="any"
+            value={propertyPrice}
+            onChange={(e) => setPropertyPrice(e.target.value)}
+            name="propertyPrice"
+            id="propertyPrice"
+            required
+          />
+        </div>
+        <div className="field">
+          <label htmlFor="downPayment">Первоначальный взнос: </label>
+          <div className="field-row">
+            <input
+              type="number"
+              step="any"
+              value={downPayment}
+              onChange={(e) => setDownPayment(e.target.value)}
+              name="downPayment"
+              id="downPayment"
+              required
+            />
+            <select
+              name="downPaymentUnit"
+              value={downPaymentUnit}
+              onChange={(e) => setDownPaymentUnit(e.target.value)}
+            >
+              <option value="rub">₽</option>
+              <option value="percent">%</option>
+            </select>
+          </div>
+        </div>
+        <div className="field">
+          <label htmlFor="rate">Процентная ставка, % годовых: </label>
+          <input
+            type="number"
+            step="0.1"
+            value={rate}
+            onChange={(e) => setRate(e.target.value)}
+            name="rate"
+            id="rate"
+            required
+          />
+        </div>
+        <div className="field">
+          <label>Сумма кредита: </label>
+          <span>
+            {loanAmount.toLocaleString("ru-RU", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}{" "}
+            ₽
+          </span>
+        </div>
+        <div className="field">
+          <label htmlFor="term">Срок кредита/займа: </label>
+          <div className="field-row">
+            <input
+              type="number"
+              step="1"
+              value={term}
+              onChange={(e) => setTerm(e.target.value)}
+              name="term"
+              id="term"
+              required
+            />
+            <select
+              name="termUnit"
+              value={termUnit}
+              onChange={(e) => setTermUnit(e.target.value)}
+            >
+              <option value="years">Лет</option>
+              <option value="months">Месяцев</option>
+            </select>
+          </div>
+        </div>
+        <div className="field">
+          <label htmlFor="issueDate">Дата выдачи: </label>
+          <input
+            type="date"
+            value={issueDate}
+            onChange={(e) => setIssueDate(e.target.value)}
+            name="issueDate"
+            id="issueDate"
+            required
+          />
+        </div>
+        <div className="field">
+          <label htmlFor="paymentType">Порядок погашения: </label>
+          <select
+            name="paymentType"
+            value={paymentType}
+            onChange={(e) => setPaymentType(e.target.value)}
+          >
+            <option value="annuity">Аннуитетный</option>
+            <option value="differentiated">Дифференцированный</option>
+          </select>
+        </div>
+      </div>
       <div>
         {paymentType === "annuity" ? (
           <p>
