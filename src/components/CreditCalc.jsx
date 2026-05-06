@@ -10,6 +10,7 @@ export default function Credit() {
     new Date().toISOString().slice(0, 10),
   );
   const [paymentType, setPaymentType] = useState("annuity");
+  const [prepayments, setPrepayments] = useState([]);
 
   const amountNum = Number(amount);
   const rateNum = Number(rate);
@@ -27,17 +28,42 @@ export default function Credit() {
     dates.push(d);
   }
 
-  const schedule = buildSchedule(
+  const { schedule, totalPrepaid } = buildSchedule(
     amountNum,
     start,
     dates,
     baseAnnuity,
     rateNum,
     paymentType,
+    prepayments,
   );
 
   const totalPayment = schedule.reduce((sum, p) => sum + p.payment, 0);
-  const overPayment = totalPayment - amountNum;
+  const overPayment = totalPayment + totalPrepaid - amountNum;
+
+  function addPrepayment() {
+    setPrepayments([
+      ...prepayments,
+      {
+        date: issueDate,
+        amount: 0,
+        type: "reduce_payment",
+        repeat: false,
+      },
+    ]);
+  }
+
+  function updatePrepayment(index, field, value) {
+    setPrepayments(
+      prepayments.map((pp, i) =>
+        i === index ? { ...pp, [field]: value } : pp,
+      ),
+    );
+  }
+
+  function removePrepayment(index) {
+    setPrepayments(prepayments.filter((_, i) => i !== index));
+  }
 
   return (
     <div className="calc-wrapper">
@@ -113,48 +139,94 @@ export default function Credit() {
           </select>
         </div>
       </div>
-      <div>
-        {paymentType === "annuity" ? (
-          <p>
-            Ежемесячный платеж:{" "}
-            {baseAnnuity.toLocaleString("ru-RU", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}{" "}
-            ₽
-          </p>
-        ) : (
-          <p>
-            Ежемесячный платеж: от{" "}
-            {schedule[0].payment.toLocaleString("ru-RU", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}{" "}
-            ₽ до{" "}
-            {schedule[schedule.length - 1].payment.toLocaleString("ru-RU", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}{" "}
-            ₽
-          </p>
-        )}
-        <p>
-          Всего выплат:{" "}
-          {totalPayment.toLocaleString("ru-RU", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}{" "}
-          ₽
-        </p>
-        <p>
-          Переплата:{" "}
-          {overPayment.toLocaleString("ru-RU", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}{" "}
-          ₽
-        </p>
+      <div className="prepayments">
+        <button onClick={addPrepayment}>+ Добавить частичное погашение</button>
+        {prepayments.map((pp, i) => (
+          <div key={i} className="prepayment-row">
+            <div className="field">
+              <label>Сумма</label>
+              <input
+                type="number"
+                value={pp.amount}
+                onChange={(e) => updatePrepayment(i, "amount", e.target.value)}
+              />
+            </div>
+            <div className="field">
+              <label>Дата</label>
+              <input
+                type="date"
+                value={pp.date}
+                onChange={(e) => updatePrepayment(i, "date", e.target.value)}
+              />
+            </div>
+            <div className="field">
+              <label>Порядок погашения</label>
+              <select
+                value={pp.type}
+                onChange={(e) => updatePrepayment(i, "type", e.target.value)}
+              >
+                <option value="reduce_payment">Уменьшить платёж</option>
+                <option value="reduce_term">Уменьшить срок</option>
+              </select>
+            </div>
+            <div>
+              <input
+                type="checkbox"
+                checked={pp.repeat}
+                onChange={(e) =>
+                  updatePrepayment(i, "repeat", e.target.checked)
+                }
+              />{" "}
+              <label>Повторять ежемесячно</label>{" "}
+              <button onClick={() => removePrepayment(i)}>×</button>
+            </div>
+          </div>
+        ))}
       </div>
+      {n > 0 && schedule.length > 0 && (
+        <div>
+          {paymentType === "annuity" ? (
+            <p>
+              Ежемесячный платеж:{" "}
+              {baseAnnuity.toLocaleString("ru-RU", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}{" "}
+              ₽
+            </p>
+          ) : (
+            <p>
+              Ежемесячный платеж: от{" "}
+              {schedule[0].payment.toLocaleString("ru-RU", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}{" "}
+              ₽ до{" "}
+              {schedule[schedule.length - 1].payment.toLocaleString("ru-RU", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}{" "}
+              ₽
+            </p>
+          )}
+          <p>
+            Всего выплат:{" "}
+            {(totalPayment + totalPrepaid).toLocaleString("ru-RU", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}{" "}
+            ₽
+          </p>
+          <p>
+            Переплата:{" "}
+            {overPayment.toLocaleString("ru-RU", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}{" "}
+            ₽
+          </p>
+        </div>
+      )}
     </div>
   );
 }
