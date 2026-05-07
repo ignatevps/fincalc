@@ -216,7 +216,7 @@ export default function Credit() {
                     updatePrepayment(i, "repeat", e.target.checked)
                   }
                 />{" "}
-                <label>Повторять ежемесячно</label>{" "}
+                <label>Повторять ежемесячно</label>
               </div>
             </div>
           ))}

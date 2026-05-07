@@ -13,6 +13,9 @@ export default function Mortgage() {
   );
   const [paymentType, setPaymentType] = useState("annuity");
   const [prepayments, setPrepayments] = useState([]);
+  const [showEarlyRepayment, setShowEarlyRepayment] = useState(false);
+  const [earlyRepaymentDate, setEarlyRepaymentDate] = useState("");
+  const [earlyRepaymentType, setEarlyRepaymentType] = useState("uniform");
 
   const rateNum = Number(rate);
   const termNum = Number(term);
@@ -46,6 +49,36 @@ export default function Mortgage() {
 
   const totalPayment = schedule.reduce((sum, p) => sum + p.payment, 0);
   const overPayment = totalPayment + totalPrepaid - loanAmount;
+  const earlyRepaymentResult = (() => {
+    if (!showEarlyRepayment || !earlyRepaymentDate) return null;
+    const row = schedule.findLast(
+      (p) => p.date <= new Date(earlyRepaymentDate),
+    );
+    if (!row) return null;
+    if (earlyRepaymentType === "lump_sum") {
+      const paidSoFar = schedule
+        .filter((p) => p.date <= new Date(earlyRepaymentDate))
+        .reduce((sum, p) => sum + p.payment, 0);
+      return {
+        amount: row.balance,
+        total: paidSoFar + row.balance,
+        overPayment: paidSoFar + row.balance - loanAmount,
+      };
+    }
+    const end = new Date(earlyRepaymentDate);
+    const start = new Date(issueDate);
+    const n =
+      (end.getFullYear() - start.getFullYear()) * 12 +
+      (end.getMonth() - start.getMonth());
+    const r = rateNum / 12 / 100;
+    const f = (1 + r) ** n;
+    const newPayment = (loanAmount * r * f) / (f - 1);
+    return {
+      amount: newPayment,
+      total: newPayment * n,
+      overPayment: newPayment * n - loanAmount,
+    };
+  })();
 
   function addPrepayment() {
     setPrepayments([
@@ -177,50 +210,98 @@ export default function Mortgage() {
           </select>
         </div>
       </div>
-      <div className="prepayments">
-        <button onClick={addPrepayment}>+ Добавить частичное погашение</button>
-        {prepayments.map((pp, i) => (
-          <div key={i} className="prepayment-row">
-            <div className="field">
-              <label>Сумма</label>
-              <input
-                type="number"
-                value={pp.amount}
-                onChange={(e) => updatePrepayment(i, "amount", e.target.value)}
-              />
-            </div>
-            <div className="field">
-              <label>Дата</label>
-              <input
-                type="date"
-                value={pp.date}
-                onChange={(e) => updatePrepayment(i, "date", e.target.value)}
-              />
-            </div>
-            <div className="field">
-              <label>Порядок погашения</label>
-              <select
-                value={pp.type}
-                onChange={(e) => updatePrepayment(i, "type", e.target.value)}
-              >
-                <option value="reduce_payment">Уменьшить платёж</option>
-                <option value="reduce_term">Уменьшить срок</option>
-              </select>
-            </div>
-            <div>
-              <input
-                type="checkbox"
-                checked={pp.repeat}
-                onChange={(e) =>
-                  updatePrepayment(i, "repeat", e.target.checked)
-                }
-              />{" "}
-              <label>Повторять ежемесячно</label>{" "}
+      {!showEarlyRepayment && (
+        <div className="prepayments">
+          <button onClick={addPrepayment}>
+            + Добавить частичное погашение
+          </button>
+          {prepayments.map((pp, i) => (
+            <div key={i} className="prepayment-row">
               <button onClick={() => removePrepayment(i)}>×</button>
+              <div className="field">
+                <label>Сумма</label>
+                <input
+                  type="number"
+                  value={pp.amount}
+                  onChange={(e) =>
+                    updatePrepayment(i, "amount", e.target.value)
+                  }
+                />
+              </div>
+              <div className="field">
+                <label>Дата</label>
+                <input
+                  type="date"
+                  value={pp.date}
+                  onChange={(e) => updatePrepayment(i, "date", e.target.value)}
+                />
+              </div>
+              <div className="field">
+                <label>Порядок погашения</label>
+                <select
+                  value={pp.type}
+                  onChange={(e) => updatePrepayment(i, "type", e.target.value)}
+                >
+                  <option value="reduce_payment">Уменьшить платёж</option>
+                  <option value="reduce_term">Уменьшить срок</option>
+                </select>
+              </div>
+              <div>
+                <input
+                  type="checkbox"
+                  checked={pp.repeat}
+                  onChange={(e) =>
+                    updatePrepayment(i, "repeat", e.target.checked)
+                  }
+                />{" "}
+                <label>Повторять ежемесячно</label>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
+      {prepayments.length === 0 && (
+        <div className="repayment">
+          <button onClick={() => setShowEarlyRepayment(true)}>
+            + Добавить досрочное погашение
+          </button>{" "}
+          {showEarlyRepayment === true && (
+            <>
+              <button onClick={() => setShowEarlyRepayment(false)}>×</button>
+              <div className="field">
+                <label htmlFor="earlyRepaymentDate">
+                  Дата досрочного погашения:{" "}
+                </label>
+                <input
+                  type="date"
+                  value={earlyRepaymentDate}
+                  onChange={(e) => setEarlyRepaymentDate(e.target.value)}
+                  name="earlyRepaymentDate"
+                  id="earlyRepaymentDate"
+                  required
+                />
+              </div>
+              <div className="field">
+                <label htmlFor="earlyRepaymentType">
+                  Порядок досрочного погашения:{" "}
+                </label>
+                <select
+                  name="earlyRepaymentType"
+                  value={earlyRepaymentType}
+                  onChange={(e) => setEarlyRepaymentType(e.target.value)}
+                >
+                  <option value="uniform">
+                    Равномерно по ежемесячным платежам
+                  </option>
+                  <option value="lump_sum">
+                    Необходимая сумма на дату досрочного платежа
+                  </option>
+                </select>
+              </div>
+            </>
+          )}
+        </div>
+      )}
       {n > 0 && schedule.length > 0 && (
         <div>
           {paymentType === "annuity" ? (
@@ -264,6 +345,38 @@ export default function Mortgage() {
             ₽
           </p>
         </div>
+      )}
+      {earlyRepaymentResult !== null && (
+        <>
+          <p>При досрочном погашении</p>
+          <p>
+            {earlyRepaymentType === "uniform"
+              ? "Новый ежемесячный платёж"
+              : `Сумма для закрытия на ${earlyRepaymentDate}`}
+            :{" "}
+            {earlyRepaymentResult.amount.toLocaleString("ru-RU", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}{" "}
+            ₽
+          </p>
+          <p>
+            Всего выплат:{" "}
+            {earlyRepaymentResult.total.toLocaleString("ru-RU", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}{" "}
+            ₽
+          </p>
+          <p>
+            Переплата:{" "}
+            {earlyRepaymentResult.overPayment.toLocaleString("ru-RU", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}{" "}
+            ₽
+          </p>
+        </>
       )}
     </div>
   );
