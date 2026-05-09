@@ -78,7 +78,7 @@ export default function Deposit() {
     <div className="calc-wrapper">
       <a href="/">Назад</a>
       <h1 className="calc-title">Калькулятор вклада</h1>
-      <div>
+      <div className="calc-form">
         <div className="field">
           <label htmlFor="amount">Сумма вклада: </label>
           <input
@@ -132,8 +132,7 @@ export default function Deposit() {
             required
           />
         </div>
-        <div className="field">
-          <label htmlFor="withCapitalization">Капитализация процентов</label>
+        <div className="field field--radio">
           <input
             type="checkbox"
             name="withCapitalization"
@@ -144,6 +143,9 @@ export default function Deposit() {
               setWithCapitalization(e.target.checked);
             }}
           />
+          <label htmlFor="withCapitalization">
+            <p>Капитализация процентов</p>
+          </label>
         </div>
         <div className="field">
           <label>
@@ -174,46 +176,52 @@ export default function Deposit() {
           </select>
         </div>
       </div>
-      <div>
-        <p>
-          Сумма в конце срока:{" "}
-          {total.toLocaleString("ru-RU", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}{" "}
-          ₽
-        </p>
-        <p>
-          Доход:{" "}
-          {interest.toLocaleString("ru-RU", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}{" "}
-          ₽
-        </p>
-        {withCapitalization && (
-          <p>
-            Эффективная ставка:{" "}
-            {effectiveRate.toLocaleString("ru-RU", {
+      <div className="result">
+        <div className="result-item">
+          <span className="result-label">Сумма в конце срока</span>
+          <span className="result-value">
+            {total.toLocaleString("ru-RU", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}{" "}
-            %
-          </p>
+            ₽
+          </span>
+        </div>
+        <div className="result-item">
+          <span className="result-label">Доход</span>
+          <span className="result-value">
+            {interest.toLocaleString("ru-RU", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}{" "}
+            ₽
+          </span>
+        </div>
+        {withCapitalization && (
+          <div className="result-item">
+            <span className="result-label">Эффективная ставка</span>
+            <span className="result-value">
+              {effectiveRate.toLocaleString("ru-RU", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}{" "}
+              %
+            </span>
+          </div>
         )}
-        <div>
-          <p>Доход по годам:</p>
-          {Object.entries(byYear).map(([year, amount]) => (
-            <p key={year}>
-              {year}:{" "}
+        <div>Начисленные проценты</div>
+        {Object.entries(byYear).map(([year, amount]) => (
+          <div key={year} className="result-item">
+            <span className="result-label">{year}</span>
+            <span className="result-value">
               {amount.toLocaleString("ru-RU", {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               })}{" "}
               ₽
-            </p>
-          ))}
-        </div>
+            </span>
+          </div>
+        ))}
       </div>
     </div>
   );

@@ -31,65 +31,8 @@ a {
   color: inherit;
 }
 
-/* calculators */
-.calc-wrapper {
-  padding: 24px 0 48px;
-}
-
-.calc-title {
-  font-size: 24px;
-  font-weight: 700;
-  margin: 16px 0 24px;
-}
-
-.field {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 10px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-bottom: 10px;
-}
-
-.field label {
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-.field-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.field input,
-.field select {
-  background: transparent;
-  border: none;
-  font-size: 16px;
-  color: var(--text-primary);
-  padding: 0;
-  outline: none;
-  width: 100%;
-}
-
-.field:focus-within {
-  border-color: #aaa;
-}
-
-.result {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 8px;
-}
-
-.result p {
-  font-size: 15px;
+@media (min-width: 1000px) {
+  .container {
+    max-width: 960px;
+  }
 }

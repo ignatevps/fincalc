@@ -42,7 +42,7 @@ export default function Inflation() {
     <div className="calc-wrapper">
       <a href="/">Назад</a>
       <h1 className="calc-title">Калькулятор инфляции</h1>
-      <div>
+      <div className="calc-form">
         <div className="field">
           <label htmlFor="amount">Сумма: </label>
           <input
@@ -84,42 +84,54 @@ export default function Inflation() {
             required
           />
         </div>
-        <div className="field">
-          <input
-            type="radio"
-            name="mode"
-            value="salary"
-            id="salary"
-            onChange={(e) => setMode(e.target.value)}
-            checked={mode === "salary"}
-          />
-          <label htmlFor="salary">Изменение зарплаты / цен</label>
-          <input
-            type="radio"
-            name="mode"
-            value="savings"
-            id="savings"
-            onChange={(e) => setMode(e.target.value)}
-            checked={mode === "savings"}
-          />
-          <label htmlFor="savings">Обесценивание сбережений</label>
+        <div className="field field--full">
+          <label className="radio-option">
+            <input
+              type="radio"
+              name="mode"
+              value="salary"
+              onChange={(e) => setMode(e.target.value)}
+              checked={mode === "salary"}
+            />
+            Изменение зарплаты / цен
+          </label>
+          <label className="radio-option">
+            <input
+              type="radio"
+              name="mode"
+              value="savings"
+              onChange={(e) => setMode(e.target.value)}
+              checked={mode === "savings"}
+            />
+            Обесценивание сбережений
+          </label>
         </div>
       </div>
       <div className="result">
         <p>Инфляция за период: {result.inflation} %</p>
-        <p>
-          {result.mode === "salary" ? "Зарплата/цена:" : "Сбережения:"}{" "}
-          {result.amount.toLocaleString("ru-RU", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}{" "}
-          ₽ ({result.periodFrom}) →{" "}
-          {result.calculated.toLocaleString("ru-RU", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}{" "}
-          ₽ ({result.periodTo})
-        </p>
+        <div className="result-comparison">
+          <div className="result-col">
+            <span className="result-date">{result.periodFrom.split("-").reverse().join("-")}</span>
+            <span className="result-amount">
+              {result.amount.toLocaleString("ru-RU", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}{" "}
+              ₽
+            </span>
+          </div>
+          <span className="result-arrow">→</span>
+          <div className="result-col">
+            <span className="result-date">{result.periodTo.split("-").reverse().join("-")}</span>
+            <span className="result-amount">
+              {result.calculated.toLocaleString("ru-RU", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}{" "}
+              ₽
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -1,0 +1,174 @@
+.calc-wrapper {
+  padding: 24px 0 48px;
+}
+
+.calc-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 16px 0 24px;
+}
+
+.field {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.field label {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.field-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.field input:not([type="checkbox"]):not([type="radio"]),
+.field select {
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  color: var(--text-primary);
+  padding: 0;
+  outline: none;
+  width: 100%;
+}
+
+.field:focus-within {
+  border-color: #aaa;
+}
+
+.field--radio {
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+}
+
+.result-comparison {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.result-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.result-date {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.result-amount {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.result-arrow {
+  font-size: 22px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.result {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.result-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.result-label {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.result-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+@media (min-width: 1000px) {
+  .calc-title {
+    font-size: 36px;
+  }
+
+  .calc-form {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: 20px;
+    row-gap: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 8px 20px 0;
+    margin-bottom: 12px;
+  }
+
+  .calc-form .field {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+    margin-bottom: 0;
+    padding: 12px 0;
+  }
+
+  .calc-form .field:focus-within {
+    border-color: #999;
+    background: transparent;
+  }
+
+  .field--full {
+    grid-column: 1 / -1;
+  }
+
+  .result {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 24px;
+    align-items: center;
+  }
+
+  .result p {
+    flex: 0 0 auto;
+  }
+
+  .result-comparison {
+    flex: 0 1 auto;
+  }
+
+  .result-amount {
+    white-space: nowrap;
+  }
+}

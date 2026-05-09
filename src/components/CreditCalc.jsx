@@ -102,7 +102,7 @@ export default function Credit() {
     <div className="calc-wrapper">
       <a href="/">Назад</a>
       <h1 className="calc-title">Кредитный калькулятор</h1>
-      <div>
+      <div className="calc-form">
         <div className="field">
           <label htmlFor="amount">Сумма кредита/займа: </label>
           <input
@@ -265,80 +265,54 @@ export default function Credit() {
         </div>
       )}
       {n > 0 && schedule.length > 0 && (
-        <div>
-          {paymentType === "annuity" ? (
-            <p>
-              Ежемесячный платеж:{" "}
-              {baseAnnuity.toLocaleString("ru-RU", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}{" "}
-              ₽
-            </p>
-          ) : (
-            <p>
-              Ежемесячный платеж: от{" "}
-              {schedule[0].payment.toLocaleString("ru-RU", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}{" "}
-              ₽ до{" "}
-              {schedule[schedule.length - 1].payment.toLocaleString("ru-RU", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}{" "}
-              ₽
-            </p>
-          )}
-          <p>
-            Всего выплат:{" "}
-            {(totalPayment + totalPrepaid).toLocaleString("ru-RU", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}{" "}
-            ₽
-          </p>
-          <p>
-            Переплата:{" "}
-            {overPayment.toLocaleString("ru-RU", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}{" "}
-            ₽
-          </p>
+        <div className="result">
+          <div className="result-item">
+            <span className="result-label">Ежемесячный платёж</span>
+            <span className="result-value">
+              {paymentType === "annuity"
+                ? `${baseAnnuity.toLocaleString("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽`
+                : `от ${schedule[0].payment.toLocaleString("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽ до ${schedule[schedule.length - 1].payment.toLocaleString("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽`}
+            </span>
+          </div>
+          <div className="result-item">
+            <span className="result-label">Всего выплат</span>
+            <span className="result-value">
+              {(totalPayment + totalPrepaid).toLocaleString("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽
+            </span>
+          </div>
+          <div className="result-item">
+            <span className="result-label">Переплата</span>
+            <span className="result-value">
+              {overPayment.toLocaleString("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽
+            </span>
+          </div>
         </div>
       )}
       {earlyRepaymentResult !== null && (
-        <>
-          <p>При досрочном погашении</p>
-          <p>
-            {earlyRepaymentType === "uniform"
-              ? "Новый ежемесячный платёж"
-              : `Сумма для закрытия на ${earlyRepaymentDate}`}
-            :{" "}
-            {earlyRepaymentResult.amount.toLocaleString("ru-RU", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}{" "}
-            ₽
-          </p>
-          <p>
-            Всего выплат:{" "}
-            {earlyRepaymentResult.total.toLocaleString("ru-RU", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}{" "}
-            ₽
-          </p>
-          <p>
-            Переплата:{" "}
-            {earlyRepaymentResult.overPayment.toLocaleString("ru-RU", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}{" "}
-            ₽
-          </p>
-        </>
+        <div className="result">
+          <div className="result-item">
+            <span className="result-label">
+              {earlyRepaymentType === "uniform"
+                ? "Новый ежемесячный платёж"
+                : `Сумма для закрытия на ${earlyRepaymentDate}`}
+            </span>
+            <span className="result-value">
+              {earlyRepaymentResult.amount.toLocaleString("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽
+            </span>
+          </div>
+          <div className="result-item">
+            <span className="result-label">Всего выплат</span>
+            <span className="result-value">
+              {earlyRepaymentResult.total.toLocaleString("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽
+            </span>
+          </div>
+          <div className="result-item">
+            <span className="result-label">Переплата</span>
+            <span className="result-value">
+              {earlyRepaymentResult.overPayment.toLocaleString("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽
+            </span>
+          </div>
+        </div>
       )}
     </div>
   );
