@@ -181,8 +181,7 @@ export default function Deposit() {
           <span className="result-label">Сумма в конце срока</span>
           <span className="result-value">
             {total.toLocaleString("ru-RU", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
+              maximumFractionDigits: 0,
             })}{" "}
             ₽
           </span>
@@ -191,8 +190,7 @@ export default function Deposit() {
           <span className="result-label">Доход</span>
           <span className="result-value">
             {interest.toLocaleString("ru-RU", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
+              maximumFractionDigits: 0,
             })}{" "}
             ₽
           </span>
@@ -202,21 +200,19 @@ export default function Deposit() {
             <span className="result-label">Эффективная ставка</span>
             <span className="result-value">
               {effectiveRate.toLocaleString("ru-RU", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
+                maximumFractionDigits: 0,
               })}{" "}
               %
             </span>
           </div>
         )}
-        <div>Начисленные проценты</div>
+        <span className="result-title">Начисленные проценты по годам</span>
         {Object.entries(byYear).map(([year, amount]) => (
           <div key={year} className="result-item">
             <span className="result-label">{year}</span>
             <span className="result-value">
               {amount.toLocaleString("ru-RU", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
+                maximumFractionDigits: 0,
               })}{" "}
               ₽
             </span>

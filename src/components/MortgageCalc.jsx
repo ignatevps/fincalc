@@ -200,14 +200,17 @@ export default function Mortgage() {
           </select>
         </div>
       </div>
-      {!showEarlyRepayment && (
-        <div className="prepayments">
-          <button onClick={addPrepayment}>
-            + Добавить частичное погашение
-          </button>
-          {prepayments.map((pp, i) => (
-            <div key={i} className="prepayment-row">
-              <button onClick={() => removePrepayment(i)}>×</button>
+      <div className="prepayments">
+        {prepayments.length > 0 && <h4 className="prepayment-title">Частичное погашение</h4>}
+        {prepayments.map((pp, i) => (
+          <div key={i} className="prepayment-row">
+            <button
+              className="button-right"
+              onClick={() => removePrepayment(i)}
+            >
+              ×
+            </button>
+            <div className="calc-form">
               <div className="field">
                 <label>Сумма</label>
                 <input
@@ -236,88 +239,103 @@ export default function Mortgage() {
                   <option value="reduce_term">Уменьшить срок</option>
                 </select>
               </div>
-              <div>
+              <div className="field field--radio field--full">
                 <input
                   type="checkbox"
                   checked={pp.repeat}
                   onChange={(e) =>
                     updatePrepayment(i, "repeat", e.target.checked)
                   }
-                />{" "}
+                />
                 <label>Повторять ежемесячно</label>
               </div>
             </div>
-          ))}
-        </div>
-      )}
-      {prepayments.length === 0 && (
-        <div className="repayment">
-          <button onClick={() => setShowEarlyRepayment(true)}>
-            + Добавить досрочное погашение
-          </button>{" "}
-          {showEarlyRepayment === true && (
-            <>
-              <button onClick={() => setShowEarlyRepayment(false)}>×</button>
-              <div className="field">
-                <label htmlFor="earlyRepaymentDate">
-                  Дата досрочного погашения:{" "}
-                </label>
-                <input
-                  type="date"
-                  value={earlyRepaymentDate}
-                  onChange={(e) => setEarlyRepaymentDate(e.target.value)}
-                  name="earlyRepaymentDate"
-                  id="earlyRepaymentDate"
-                  required
-                />
-              </div>
-              <div className="field">
-                <label htmlFor="earlyRepaymentType">
-                  Порядок досрочного погашения:{" "}
-                </label>
-                <select
-                  name="earlyRepaymentType"
-                  value={earlyRepaymentType}
-                  onChange={(e) => setEarlyRepaymentType(e.target.value)}
-                >
-                  <option value="uniform">
-                    Равномерно по ежемесячным платежам
-                  </option>
-                  <option value="lump_sum">
-                    Необходимая сумма на дату досрочного платежа
-                  </option>
-                </select>
-              </div>
-            </>
-          )}
-        </div>
-      )}
+          </div>
+        ))}
+        <button className="btn-add" onClick={addPrepayment}>
+          + Добавить частичное погашение
+        </button>
+      </div>
+      <div className="repayment">
+        <label className="checkbox-row">
+          <input
+            type="checkbox"
+            checked={showEarlyRepayment}
+            onChange={(e) => setShowEarlyRepayment(e.target.checked)}
+          />
+          Досрочное погашение
+        </label>
+        {showEarlyRepayment && (
+          <div className="calc-form">
+            <div className="field">
+              <label htmlFor="earlyRepaymentDate">
+                Дата досрочного погашения
+              </label>
+              <input
+                type="date"
+                value={earlyRepaymentDate}
+                onChange={(e) => setEarlyRepaymentDate(e.target.value)}
+                name="earlyRepaymentDate"
+                id="earlyRepaymentDate"
+                required
+              />
+            </div>
+            <div className="field field--span2">
+              <label htmlFor="earlyRepaymentType">
+                Порядок досрочного погашения
+              </label>
+              <select
+                name="earlyRepaymentType"
+                value={prepayments.length > 0 ? "lump_sum" : earlyRepaymentType}
+                disabled={prepayments.length > 0}
+                onChange={(e) => setEarlyRepaymentType(e.target.value)}
+              >
+                <option value="uniform">
+                  Равномерно по ежемесячным платежам
+                </option>
+                <option value="lump_sum">
+                  Необходимая сумма на дату досрочного платежа
+                </option>
+              </select>
+            </div>
+          </div>
+        )}
+      </div>
       {n > 0 && schedule.length > 0 && (
         <div className="result">
           <div className="result-item">
             <span className="result-label">Сумма кредита</span>
             <span className="result-value">
-              {loanAmount.toLocaleString("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽
+              {loanAmount.toLocaleString("ru-RU", {
+                maximumFractionDigits: 0,
+              })}{" "}
+              ₽
             </span>
           </div>
           <div className="result-item">
             <span className="result-label">Ежемесячный платёж</span>
             <span className="result-value">
               {paymentType === "annuity"
-                ? `${baseAnnuity.toLocaleString("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽`
-                : `от ${schedule[0].payment.toLocaleString("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽ до ${schedule[schedule.length - 1].payment.toLocaleString("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽`}
+                ? `${baseAnnuity.toLocaleString("ru-RU", { maximumFractionDigits: 0 })} ₽`
+                : `от ${schedule[0].payment.toLocaleString("ru-RU", { maximumFractionDigits: 0 })} ₽ до ${schedule[schedule.length - 1].payment.toLocaleString("ru-RU", { maximumFractionDigits: 0 })} ₽`}
             </span>
           </div>
           <div className="result-item">
             <span className="result-label">Всего выплат</span>
             <span className="result-value">
-              {(totalPayment + totalPrepaid).toLocaleString("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽
+              {(totalPayment + totalPrepaid).toLocaleString("ru-RU", {
+                maximumFractionDigits: 0,
+              })}{" "}
+              ₽
             </span>
           </div>
           <div className="result-item">
             <span className="result-label">Переплата</span>
             <span className="result-value">
-              {overPayment.toLocaleString("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽
+              {overPayment.toLocaleString("ru-RU", {
+                maximumFractionDigits: 0,
+              })}{" "}
+              ₽
             </span>
           </div>
         </div>
@@ -331,19 +349,28 @@ export default function Mortgage() {
                 : `Сумма для закрытия на ${earlyRepaymentDate}`}
             </span>
             <span className="result-value">
-              {earlyRepaymentResult.amount.toLocaleString("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽
+              {earlyRepaymentResult.amount.toLocaleString("ru-RU", {
+                maximumFractionDigits: 0,
+              })}{" "}
+              ₽
             </span>
           </div>
           <div className="result-item">
             <span className="result-label">Всего выплат</span>
             <span className="result-value">
-              {earlyRepaymentResult.total.toLocaleString("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽
+              {earlyRepaymentResult.total.toLocaleString("ru-RU", {
+                maximumFractionDigits: 0,
+              })}{" "}
+              ₽
             </span>
           </div>
           <div className="result-item">
             <span className="result-label">Переплата</span>
             <span className="result-value">
-              {earlyRepaymentResult.overPayment.toLocaleString("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽
+              {earlyRepaymentResult.overPayment.toLocaleString("ru-RU", {
+                maximumFractionDigits: 0,
+              })}{" "}
+              ₽
             </span>
           </div>
         </div>

@@ -84,7 +84,7 @@ export default function Inflation() {
             required
           />
         </div>
-        <div className="field field--full">
+        <div className="field--full">
           <label className="radio-option">
             <input
               type="radio"
@@ -108,29 +108,32 @@ export default function Inflation() {
         </div>
       </div>
       <div className="result">
-        <p>Инфляция за период: {result.inflation} %</p>
-        <div className="result-comparison">
-          <div className="result-col">
-            <span className="result-date">{result.periodFrom.split("-").reverse().join("-")}</span>
-            <span className="result-amount">
-              {result.amount.toLocaleString("ru-RU", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}{" "}
-              ₽
-            </span>
-          </div>
-          <span className="result-arrow">→</span>
-          <div className="result-col">
-            <span className="result-date">{result.periodTo.split("-").reverse().join("-")}</span>
-            <span className="result-amount">
-              {result.calculated.toLocaleString("ru-RU", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}{" "}
-              ₽
-            </span>
-          </div>
+        <div className="result-item">
+          <span className="result-label">Инфляция за период</span>
+          <span className="result-value">{result.inflation} %</span>
+        </div>
+        <div className="result-item">
+          <span className="result-label">
+            {result.periodFrom.split("-").reverse().join("-")}
+          </span>
+          <span className="result-value">
+            {result.amount.toLocaleString("ru-RU", {
+              maximumFractionDigits: 0,
+            })}{" "}
+            ₽
+          </span>
+        </div>
+        <span className="result-arrow"></span>
+        <div className="result-item">
+          <span className="result-label">
+            {result.periodTo.split("-").reverse().join("-")}
+          </span>
+          <span className="result-value">
+            {result.calculated.toLocaleString("ru-RU", {
+              maximumFractionDigits: 0,
+            })}{" "}
+            ₽
+          </span>
         </div>
       </div>
     </div>
