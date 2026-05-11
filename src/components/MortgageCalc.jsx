@@ -1,5 +1,6 @@
 import { useState } from "react";
 import buildSchedule from "../utils/loanSchedule";
+import { formatNumber, formatCurrency } from "../utils/formatters";
 
 export default function Mortgage() {
   const [propertyPrice, setPropertyPrice] = useState(6000000);
@@ -112,10 +113,12 @@ export default function Mortgage() {
         <div className="field">
           <label htmlFor="propertyPrice">Стоимость недвижимости: </label>
           <input
-            type="number"
+            type="text"
             step="any"
-            value={propertyPrice}
-            onChange={(e) => setPropertyPrice(e.target.value)}
+            value={formatNumber(propertyPrice)}
+            onChange={(e) =>
+              setPropertyPrice(Number(e.target.value.replace(/\D/g, "")))
+            }
             name="propertyPrice"
             id="propertyPrice"
             required
@@ -125,10 +128,20 @@ export default function Mortgage() {
           <label htmlFor="downPayment">Первоначальный взнос: </label>
           <div className="field-row">
             <input
-              type="number"
+              type={downPaymentUnit === "rub" ? "text" : "number"}
               step="any"
-              value={downPayment}
-              onChange={(e) => setDownPayment(e.target.value)}
+              value={
+                downPaymentUnit === "rub"
+                  ? formatNumber(downPayment)
+                  : downPayment
+              }
+              onChange={(e) =>
+                setDownPayment(
+                  downPaymentUnit === "rub"
+                    ? Number(e.target.value.replace(/\D/g, ""))
+                    : e.target.value,
+                )
+              }
               name="downPayment"
               id="downPayment"
               required
@@ -201,7 +214,9 @@ export default function Mortgage() {
         </div>
       </div>
       <div className="prepayments">
-        {prepayments.length > 0 && <h4 className="prepayment-title">Частичное погашение</h4>}
+        {prepayments.length > 0 && (
+          <h4 className="prepayment-title">Частичное погашение</h4>
+        )}
         {prepayments.map((pp, i) => (
           <div key={i} className="prepayment-row">
             <button
@@ -214,10 +229,14 @@ export default function Mortgage() {
               <div className="field">
                 <label>Сумма</label>
                 <input
-                  type="number"
-                  value={pp.amount}
+                  type="text"
+                  value={formatNumber(pp.amount)}
                   onChange={(e) =>
-                    updatePrepayment(i, "amount", e.target.value)
+                    updatePrepayment(
+                      i,
+                      "amount",
+                      Number(e.target.value.replace(/\D/g, "")),
+                    )
                   }
                 />
               </div>
@@ -315,28 +334,27 @@ export default function Mortgage() {
           <div className="result-item">
             <span className="result-label">Ежемесячный платёж</span>
             <span className="result-value">
-              {paymentType === "annuity"
-                ? `${baseAnnuity.toLocaleString("ru-RU", { maximumFractionDigits: 0 })} ₽`
-                : `от ${schedule[0].payment.toLocaleString("ru-RU", { maximumFractionDigits: 0 })} ₽ до ${schedule[schedule.length - 1].payment.toLocaleString("ru-RU", { maximumFractionDigits: 0 })} ₽`}
+              {paymentType === "annuity" ? (
+                formatCurrency(baseAnnuity)
+              ) : (
+                <>
+                  <span className="result-label">от</span>{" "}
+                  {formatCurrency(schedule[0].payment)}{" "}
+                  <span className="result-label">до</span>{" "}
+                  {formatCurrency(schedule[schedule.length - 1].payment)}
+                </>
+              )}
             </span>
           </div>
           <div className="result-item">
             <span className="result-label">Всего выплат</span>
             <span className="result-value">
-              {(totalPayment + totalPrepaid).toLocaleString("ru-RU", {
-                maximumFractionDigits: 0,
-              })}{" "}
-              ₽
+              {formatCurrency(totalPayment + totalPrepaid)}
             </span>
           </div>
           <div className="result-item">
             <span className="result-label">Переплата</span>
-            <span className="result-value">
-              {overPayment.toLocaleString("ru-RU", {
-                maximumFractionDigits: 0,
-              })}{" "}
-              ₽
-            </span>
+            <span className="result-value">{formatCurrency(overPayment)}</span>
           </div>
         </div>
       )}
@@ -349,28 +367,19 @@ export default function Mortgage() {
                 : `Сумма для закрытия на ${earlyRepaymentDate}`}
             </span>
             <span className="result-value">
-              {earlyRepaymentResult.amount.toLocaleString("ru-RU", {
-                maximumFractionDigits: 0,
-              })}{" "}
-              ₽
+              {formatCurrency(earlyRepaymentResult.amount)}
             </span>
           </div>
           <div className="result-item">
             <span className="result-label">Всего выплат</span>
             <span className="result-value">
-              {earlyRepaymentResult.total.toLocaleString("ru-RU", {
-                maximumFractionDigits: 0,
-              })}{" "}
-              ₽
+              {formatCurrency(earlyRepaymentResult.total)}
             </span>
           </div>
           <div className="result-item">
             <span className="result-label">Переплата</span>
             <span className="result-value">
-              {earlyRepaymentResult.overPayment.toLocaleString("ru-RU", {
-                maximumFractionDigits: 0,
-              })}{" "}
-              ₽
+              {formatCurrency(earlyRepaymentResult.overPayment)}
             </span>
           </div>
         </div>

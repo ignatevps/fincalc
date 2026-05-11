@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { formatNumber, formatCurrency } from "../utils/formatters";
 
 export default function Deposit() {
   const [amount, setAmount] = useState(100000);
@@ -82,10 +83,12 @@ export default function Deposit() {
         <div className="field">
           <label htmlFor="amount">Сумма вклада: </label>
           <input
-            type="number"
+            type="text"
             step="any"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            value={formatNumber(amount)}
+            onChange={(e) =>
+              setAmount(Number(e.target.value.replace(/\D/g, "")))
+            }
             id="amount"
             required
           />
@@ -179,28 +182,18 @@ export default function Deposit() {
       <div className="result">
         <div className="result-item">
           <span className="result-label">Сумма в конце срока</span>
-          <span className="result-value">
-            {total.toLocaleString("ru-RU", {
-              maximumFractionDigits: 0,
-            })}{" "}
-            ₽
-          </span>
+          <span className="result-value">{formatCurrency(total)}</span>
         </div>
         <div className="result-item">
           <span className="result-label">Доход</span>
-          <span className="result-value">
-            {interest.toLocaleString("ru-RU", {
-              maximumFractionDigits: 0,
-            })}{" "}
-            ₽
-          </span>
+          <span className="result-value">{formatCurrency(interest)}</span>
         </div>
         {withCapitalization && (
           <div className="result-item">
             <span className="result-label">Эффективная ставка</span>
             <span className="result-value">
               {effectiveRate.toLocaleString("ru-RU", {
-                maximumFractionDigits: 0,
+                maximumFractionDigits: 2,
               })}{" "}
               %
             </span>
@@ -210,12 +203,7 @@ export default function Deposit() {
         {Object.entries(byYear).map(([year, amount]) => (
           <div key={year} className="result-item">
             <span className="result-label">{year}</span>
-            <span className="result-value">
-              {amount.toLocaleString("ru-RU", {
-                maximumFractionDigits: 0,
-              })}{" "}
-              ₽
-            </span>
+            <span className="result-value">{formatCurrency(amount)}</span>
           </div>
         ))}
       </div>

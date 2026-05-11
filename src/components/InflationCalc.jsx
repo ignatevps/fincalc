@@ -1,5 +1,6 @@
 import cpiData from "../data/cpi.json";
 import { useState } from "react";
+import { formatNumber, formatCurrency } from "../utils/formatters";
 
 export default function Inflation() {
   const [amount, setAmount] = useState(100000);
@@ -46,10 +47,12 @@ export default function Inflation() {
         <div className="field">
           <label htmlFor="amount">Сумма: </label>
           <input
-            type="number"
+            type="text"
             step="any"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            value={formatNumber(amount)}
+            onChange={(e) =>
+              setAmount(Number(e.target.value.replace(/\D/g, "")))
+            }
             name="amount"
             id="amount"
             required
@@ -116,12 +119,7 @@ export default function Inflation() {
           <span className="result-label">
             {result.periodFrom.split("-").reverse().join("-")}
           </span>
-          <span className="result-value">
-            {result.amount.toLocaleString("ru-RU", {
-              maximumFractionDigits: 0,
-            })}{" "}
-            ₽
-          </span>
+          <span className="result-value">{formatCurrency(result.amount)}</span>
         </div>
         <span className="result-arrow"></span>
         <div className="result-item">
@@ -129,10 +127,7 @@ export default function Inflation() {
             {result.periodTo.split("-").reverse().join("-")}
           </span>
           <span className="result-value">
-            {result.calculated.toLocaleString("ru-RU", {
-              maximumFractionDigits: 0,
-            })}{" "}
-            ₽
+            {formatCurrency(result.calculated)}
           </span>
         </div>
       </div>
