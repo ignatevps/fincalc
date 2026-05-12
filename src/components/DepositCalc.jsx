@@ -76,135 +76,139 @@ export default function Deposit() {
   const effectiveRate = (interest / amountNum / (totalDays / 365.25)) * 100;
 
   return (
-    <div className="calc-wrapper">
-      <div className="calc-form">
-        <div className="field">
-          <label htmlFor="amount">Сумма вклада: </label>
-          <input
-            type="text"
-            step="any"
-            value={formatNumber(amount)}
-            onChange={(e) =>
-              setAmount(Number(e.target.value.replace(/\D/g, "")))
-            }
-            id="amount"
-            required
-          />
-        </div>
-        <div className="field">
-          <label htmlFor="term">Срок вклада: </label>
-          <div className="field-row">
+    <>
+      <div className="calc-wrapper">
+        <div className="calc-form">
+          <div className="field">
+            <label htmlFor="amount">Сумма вклада: </label>
             <input
-              type="number"
-              step="1"
-              value={term}
-              onChange={(e) => setTerm(e.target.value)}
-              id="term"
+              type="text"
+              step="any"
+              value={formatNumber(amount)}
+              onChange={(e) =>
+                setAmount(Number(e.target.value.replace(/\D/g, "")))
+              }
+              id="amount"
               required
             />
+          </div>
+          <div className="field">
+            <label htmlFor="term">Срок вклада: </label>
+            <div className="field-row">
+              <input
+                type="number"
+                step="1"
+                value={term}
+                onChange={(e) => setTerm(e.target.value)}
+                id="term"
+                required
+              />
+              <select
+                name="termUnit"
+                value={termUnit}
+                onChange={(e) => setTermUnit(e.target.value)}
+              >
+                <option value="years">Лет</option>
+                <option value="months">Месяцев</option>
+              </select>
+            </div>
+          </div>
+          <div className="field">
+            <label htmlFor="rate">Процентная ставка, % годовых: </label>
+            <input
+              type="number"
+              step="0.01"
+              value={rate}
+              onChange={(e) => setRate(e.target.value)}
+              id="rate"
+              required
+            />
+          </div>
+          <div className="field">
+            <label htmlFor="openDate">Дата открытия: </label>
+            <input
+              type="date"
+              value={openDate}
+              onChange={(e) => setOpenDate(e.target.value)}
+              id="openDate"
+              required
+            />
+          </div>
+          <label htmlFor="withCapitalization" className="checkbox-row">
+            <input
+              type="checkbox"
+              name="withCapitalization"
+              checked={withCapitalization}
+              id="withCapitalization"
+              onChange={(e) => {
+                setFrequency("monthly");
+                setWithCapitalization(e.target.checked);
+              }}
+            />
+            Капитализация процентов
+          </label>
+          <div className="field">
+            <label>
+              {withCapitalization
+                ? "Периодичность капитализации:"
+                : "Периодичность выплат:"}
+            </label>
             <select
-              name="termUnit"
-              value={termUnit}
-              onChange={(e) => setTermUnit(e.target.value)}
+              name="frequency"
+              value={frequency}
+              onChange={(e) => setFrequency(e.target.value)}
             >
-              <option value="years">Лет</option>
-              <option value="months">Месяцев</option>
+              {withCapitalization ? (
+                <>
+                  <option value="daily">Ежедневно</option>
+                  <option value="monthly">Ежемесячно</option>
+                  <option value="quarterly">Ежеквартально</option>
+                  <option value="yearly">Ежегодно</option>
+                </>
+              ) : (
+                <>
+                  <option value="monthly">Ежемесячно</option>
+                  <option value="quarterly">Ежеквартально</option>
+                  <option value="yearly">Ежегодно</option>
+                  <option value="end">В конце срока</option>
+                </>
+              )}
             </select>
           </div>
         </div>
-        <div className="field">
-          <label htmlFor="rate">Процентная ставка, % годовых: </label>
-          <input
-            type="number"
-            step="0.01"
-            value={rate}
-            onChange={(e) => setRate(e.target.value)}
-            id="rate"
-            required
-          />
-        </div>
-        <div className="field">
-          <label htmlFor="openDate">Дата открытия: </label>
-          <input
-            type="date"
-            value={openDate}
-            onChange={(e) => setOpenDate(e.target.value)}
-            id="openDate"
-            required
-          />
-        </div>
-        <div className="field field--radio">
-          <input
-            type="checkbox"
-            name="withCapitalization"
-            checked={withCapitalization}
-            id="withCapitalization"
-            onChange={(e) => {
-              setFrequency("monthly");
-              setWithCapitalization(e.target.checked);
-            }}
-          />
-          <label htmlFor="withCapitalization">
-            <p>Капитализация процентов</p>
-          </label>
-        </div>
-        <div className="field">
-          <label>
-            {withCapitalization
-              ? "Периодичность капитализации:"
-              : "Периодичность выплат:"}
-          </label>
-          <select
-            name="frequency"
-            value={frequency}
-            onChange={(e) => setFrequency(e.target.value)}
-          >
-            {withCapitalization ? (
-              <>
-                <option value="daily">Ежедневно</option>
-                <option value="monthly">Ежемесячно</option>
-                <option value="quarterly">Ежеквартально</option>
-                <option value="yearly">Ежегодно</option>
-              </>
-            ) : (
-              <>
-                <option value="monthly">Ежемесячно</option>
-                <option value="quarterly">Ежеквартально</option>
-                <option value="yearly">Ежегодно</option>
-                <option value="end">В конце срока</option>
-              </>
-            )}
-          </select>
-        </div>
-      </div>
-      <div className="result">
-        <div className="result-item">
-          <span className="result-label">Сумма в конце срока</span>
-          <span className="result-value">{formatCurrency(total)}</span>
-        </div>
-        <div className="result-item">
-          <span className="result-label">Доход</span>
-          <span className="result-value">{formatCurrency(interest)}</span>
-        </div>
-        {withCapitalization && (
+        <div className="result">
           <div className="result-item">
-            <span className="result-label">Эффективная ставка</span>
-            <span className="result-value">
-              {effectiveRate.toLocaleString("ru-RU", {
-                maximumFractionDigits: 2,
-              })}{" "}
-              %
-            </span>
+            <span className="result-label">Сумма в конце срока</span>
+            <span className="result-value">{formatCurrency(total)}</span>
           </div>
-        )}
-        <span className="result-title">Начисленные проценты по годам</span>
-        {Object.entries(byYear).map(([year, amount]) => (
-          <div key={year} className="result-item">
-            <span className="result-label">{year}</span>
-            <span className="result-value">{formatCurrency(amount)}</span>
+          <div className="result-item">
+            <span className="result-label">Доход</span>
+            <span className="result-value">{formatCurrency(interest)}</span>
           </div>
-        ))}
+          {withCapitalization && (
+            <div className="result-item">
+              <span className="result-label">Эффективная ставка</span>
+              <span className="result-value">
+                {effectiveRate.toLocaleString("ru-RU", {
+                  maximumFractionDigits: 2,
+                })}{" "}
+                %
+              </span>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+      <div className="result-wrapper">
+        <div className="result-year">
+          <span className="result-title">Начисленные проценты по годам</span>
+          {Object.entries(byYear).map(([year, amount]) => (
+            <div key={year} className="result-item">
+              <span className="result-label">{year}</span>
+              <span className="result-value-sm">{formatCurrency(amount)}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
   );
 }

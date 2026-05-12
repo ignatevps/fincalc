@@ -37,8 +37,13 @@
 }
 
 .calc-card:active {
-  background: #2a2a2a;
+  background: #ececec;
 }
+
+.calc-card:hover {
+  border: 1px solid #444;
+}
+
 .calc-icon {
   font-size: 28px;
   flex-shrink: 0;
