@@ -3,5 +3,11 @@ import CalcLayout from "../../layouts/CalcLayout.astro";
 import MortgageCalc from "../../components/MortgageCalc";
 ---
 <CalcLayout title="Калькулятор ипотеки" description="Рассчитайте ежемесячный платеж и переплату по кредиту">
-  <MortgageCalc client:load />
+  <div class="calc-page">
+    <div class="calc-header">
+      <a href="/">←</a>
+      <h1 class="title">Калькулятор ипотеки</h1>
+    </div>
+    <MortgageCalc client:load />
+  </div>
 </CalcLayout>

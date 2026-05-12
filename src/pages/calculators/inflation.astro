@@ -3,5 +3,11 @@ import CalcLayout from "../../layouts/CalcLayout.astro";
 import InflationCalc from "../../components/InflationCalc";
 ---
 <CalcLayout title="Калькулятор инфляции" description="Расчитайте как обесценились деньги">
-  <InflationCalc client:load />
+  <div class="calc-page">
+    <div class="calc-header">
+      <a href="/">←</a>
+      <h1 class="title">Калькулятор инфляции</h1>
+    </div>  
+    <InflationCalc client:load />
+  </div>
 </CalcLayout>

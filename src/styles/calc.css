@@ -7,6 +7,31 @@
   background: #fff;
 }
 
+.calc-header {
+  position: relative;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.calc-header a {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.calc-page {
+  padding: 48px 0 32px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
 .calc-title {
   font-size: 18px;
   font-weight: 700;
@@ -187,6 +212,10 @@
 }
 
 @media (min-width: 1000px) {
+  .title {
+    font-size: 28px;
+  }
+
   .calc-title {
     font-size: 24px;
   }

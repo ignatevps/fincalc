@@ -41,8 +41,6 @@ export default function Inflation() {
 
   return (
     <div className="calc-wrapper">
-      <a href="/">Назад</a>
-      <h1 className="calc-title">Калькулятор инфляции</h1>
       <div className="calc-form">
         <div className="field">
           <label htmlFor="amount">Сумма: </label>

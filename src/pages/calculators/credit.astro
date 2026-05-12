@@ -3,5 +3,11 @@ import CalcLayout from "../../layouts/CalcLayout.astro";
 import CreditCalc from "../../components/CreditCalc";
 ---
 <CalcLayout title="Калькулятор кредита" description="Рассчитайте ежемесячный платеж и переплату по кредиту">
-  <CreditCalc client:load />
+  <div class="calc-page">
+    <div class="calc-header">
+      <a href="/">←</a>
+      <h1 class="title">Калькулятор кредита</h1>
+    </div>
+    <CreditCalc client:load />
+  </div>
 </CalcLayout>

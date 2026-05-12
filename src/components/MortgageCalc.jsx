@@ -107,8 +107,6 @@ export default function Mortgage() {
 
   return (
     <div className="calc-wrapper">
-      <a href="/">Назад</a>
-      <h1 className="calc-title">Калькулятор ипотеки</h1>
       <div className="calc-form">
         <div className="field">
           <label htmlFor="propertyPrice">Стоимость недвижимости: </label>

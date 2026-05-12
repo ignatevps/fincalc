@@ -3,7 +3,7 @@
 }
 
 .title {
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 700;
   line-height: 1.2;
   margin-bottom: 40px;
@@ -56,4 +56,11 @@
   font-size: 22px;
   color: var(--text-muted);
   flex-shrink: 0;
+}
+
+@media (min-width: 1000px) {
+  .calc-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
 }

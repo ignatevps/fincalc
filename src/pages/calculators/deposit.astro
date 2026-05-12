@@ -3,5 +3,11 @@ import CalcLayout from "../../layouts/CalcLayout.astro";
 import DepositCalc from "../../components/DepositCalc";
 ---
 <CalcLayout title="Калькулятор вклада" description="Узнайте сколько принесет дохода вклад">
-  <DepositCalc client:load />
+  <div class="calc-page">
+    <div class="calc-header">
+      <a href="/">←</a>
+      <h1 class="title">Калькулятор вклада</h1>
+    </div>
+    <DepositCalc client:load />
+  </div>
 </CalcLayout>

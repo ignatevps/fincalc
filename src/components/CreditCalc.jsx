@@ -76,10 +76,12 @@ export default function Credit() {
   })();
 
   function addPrepayment() {
+    const d = new Date(issueDate);
+    d.setMonth(d.getMonth() + 1);
     setPrepayments([
       ...prepayments,
       {
-        date: issueDate,
+        date: d.toISOString().slice(0, 10),
         amount: 0,
         type: "reduce_payment",
         repeat: false,
@@ -101,8 +103,6 @@ export default function Credit() {
 
   return (
     <div className="calc-wrapper">
-      <a href="/">Назад</a>
-      <h1 className="calc-title">Кредитный калькулятор</h1>
       <div className="calc-form">
         <div className="field">
           <label htmlFor="amount">Сумма кредита/займа: </label>
