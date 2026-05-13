@@ -1,5 +1,8 @@
 import { useState } from "react";
-import buildSchedule from "../utils/loanSchedule";
+import buildSchedule, {
+  calcEarlyRepayment,
+  calcUniformPayment,
+} from "../utils/loanSchedule";
 import { formatNumber, formatCurrency } from "../utils/formatters";
 
 export default function Mortgage() {
@@ -38,7 +41,7 @@ export default function Mortgage() {
     dates.push(d);
   }
 
-  const { schedule, totalPrepaid } = buildSchedule(
+  const { schedule, totalPrepaid, prepaidLog } = buildSchedule(
     loanAmount,
     start,
     dates,
@@ -52,33 +55,23 @@ export default function Mortgage() {
   const overPayment = totalPayment + totalPrepaid - loanAmount;
   const earlyRepaymentResult = (() => {
     if (!showEarlyRepayment || !earlyRepaymentDate) return null;
-    const row = schedule.findLast(
-      (p) => p.date <= new Date(earlyRepaymentDate),
-    );
-    if (!row) return null;
+
     if (earlyRepaymentType === "lump_sum") {
-      const paidSoFar = schedule
-        .filter((p) => p.date <= new Date(earlyRepaymentDate))
-        .reduce((sum, p) => sum + p.payment, 0);
-      return {
-        amount: row.balance,
-        total: paidSoFar + row.balance,
-        overPayment: paidSoFar + row.balance - loanAmount,
-      };
+      return calcEarlyRepayment(
+        schedule,
+        prepaidLog,
+        earlyRepaymentDate,
+        loanAmount,
+        rateNum,
+      );
+    } else {
+      return calcUniformPayment(
+        loanAmount,
+        rateNum,
+        issueDate,
+        earlyRepaymentDate,
+      );
     }
-    const end = new Date(earlyRepaymentDate);
-    const start = new Date(issueDate);
-    const n =
-      (end.getFullYear() - start.getFullYear()) * 12 +
-      (end.getMonth() - start.getMonth());
-    const r = rateNum / 12 / 100;
-    const f = (1 + r) ** n;
-    const newPayment = (loanAmount * r * f) / (f - 1);
-    return {
-      amount: newPayment,
-      total: newPayment * n,
-      overPayment: newPayment * n - loanAmount,
-    };
   })();
 
   function addPrepayment() {

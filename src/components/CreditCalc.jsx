@@ -1,6 +1,11 @@
 import { useState } from "react";
-import buildSchedule from "../utils/loanSchedule";
+import { createPortal } from "react-dom";
+import buildSchedule, {
+  calcEarlyRepayment,
+  calcUniformPayment,
+} from "../utils/loanSchedule";
 import { formatNumber, formatCurrency } from "../utils/formatters";
+import PaymentSchedule from "./PaymentSchedule";
 
 export default function Credit() {
   const [amount, setAmount] = useState(500000);
@@ -14,7 +19,8 @@ export default function Credit() {
   const [prepayments, setPrepayments] = useState([]);
   const [showEarlyRepayment, setShowEarlyRepayment] = useState(false);
   const [earlyRepaymentDate, setEarlyRepaymentDate] = useState("");
-  const [earlyRepaymentType, setEarlyRepaymentType] = useState("uniform");
+  const [earlyRepaymentType, setEarlyRepaymentType] = useState("lump_sum");
+  const [showSchedule, setShowSchedule] = useState(false);
 
   const amountNum = Number(amount);
   const rateNum = Number(rate);
@@ -32,7 +38,7 @@ export default function Credit() {
     dates.push(d);
   }
 
-  const { schedule, totalPrepaid } = buildSchedule(
+  const { schedule, totalPrepaid, prepaidLog } = buildSchedule(
     amountNum,
     start,
     dates,
@@ -46,33 +52,23 @@ export default function Credit() {
   const overPayment = totalPayment + totalPrepaid - amountNum;
   const earlyRepaymentResult = (() => {
     if (!showEarlyRepayment || !earlyRepaymentDate) return null;
-    const row = schedule.findLast(
-      (p) => p.date <= new Date(earlyRepaymentDate),
-    );
-    if (!row) return null;
+
     if (earlyRepaymentType === "lump_sum") {
-      const paidSoFar = schedule
-        .filter((p) => p.date <= new Date(earlyRepaymentDate))
-        .reduce((sum, p) => sum + p.payment, 0);
-      return {
-        amount: row.balance,
-        total: paidSoFar + row.balance,
-        overPayment: paidSoFar + row.balance - amountNum,
-      };
+      return calcEarlyRepayment(
+        schedule,
+        prepaidLog,
+        earlyRepaymentDate,
+        amountNum,
+        rateNum,
+      );
+    } else {
+      return calcUniformPayment(
+        amountNum,
+        rateNum,
+        issueDate,
+        earlyRepaymentDate,
+      );
     }
-    const end = new Date(earlyRepaymentDate);
-    const start = new Date(issueDate);
-    const n =
-      (end.getFullYear() - start.getFullYear()) * 12 +
-      (end.getMonth() - start.getMonth());
-    const r = rateNum / 12 / 100;
-    const f = (1 + r) ** n;
-    const newPayment = (amountNum * r * f) / (f - 1);
-    return {
-      amount: newPayment,
-      total: newPayment * n,
-      overPayment: newPayment * n - amountNum,
-    };
   })();
 
   function addPrepayment() {
@@ -309,6 +305,44 @@ export default function Credit() {
             <span className="result-label">Переплата</span>
             <span className="result-value">{formatCurrency(overPayment)}</span>
           </div>
+          <button
+            className="btn-schedule"
+            onClick={() => setShowSchedule(!showSchedule)}
+          >
+            {showSchedule ? "Скрыть" : "График платежей"}
+          </button>
+          {showSchedule &&
+            createPortal(
+              <div
+                className="modal-overlay"
+                onClick={() => setShowSchedule(false)}
+              >
+                <div
+                  className="modal-content"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <button
+                    className="modal-close"
+                    onClick={() => setShowSchedule(false)}
+                  >
+                    ×
+                  </button>
+                  <PaymentSchedule
+                    schedule={schedule}
+                    prepaidLog={prepaidLog}
+                    earlyRepayment={
+                      earlyRepaymentResult
+                        ? {
+                            date: new Date(earlyRepaymentDate),
+                            amount: earlyRepaymentResult.amount,
+                          }
+                        : null
+                    }
+                  />
+                </div>
+              </div>,
+              document.body,
+            )}
         </div>
       )}
       {earlyRepaymentResult !== null && (
@@ -325,8 +359,9 @@ export default function Credit() {
           </div>
           <div className="result-item">
             <span className="result-label">Всего выплат</span>
-            <span className="result-value"></span>
-            {formatCurrency(earlyRepaymentResult.total)}
+            <span className="result-value">
+              {formatCurrency(earlyRepaymentResult.total)}
+            </span>
           </div>
           <div className="result-item">
             <span className="result-label">Переплата</span>
