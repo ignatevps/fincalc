@@ -27,7 +27,7 @@ export default function Credit() {
   const termNum = Number(term);
   const start = new Date(issueDate);
 
-  const { schedule, totalPrepaid, prepaidLog } = buildSchedule(
+  const { schedule, totalPrepaid, prepaidLog, baseAnnuity } = buildSchedule(
     amountNum,
     start,
     rateNum,
@@ -267,7 +267,7 @@ export default function Credit() {
           </div>
         )}
       </div>
-      {n > 0 && schedule.length > 0 && (
+      {schedule.length > 0 && (
         <div className="result">
           <div className="result-item">
             <span className="result-label">Ежемесячный платёж</span>

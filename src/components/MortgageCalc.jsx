@@ -30,7 +30,7 @@ export default function Mortgage() {
       ? downPayment
       : propertyPrice * (downPayment / 100));
 
-  const { schedule, totalPrepaid, prepaidLog } = buildSchedule(
+  const { schedule, totalPrepaid, prepaidLog, baseAnnuity } = buildSchedule(
     loanAmount,
     start,
     rateNum,
@@ -303,7 +303,7 @@ export default function Mortgage() {
           </div>
         )}
       </div>
-      {n > 0 && schedule.length > 0 && (
+      {schedule.length > 0 && (
         <div className="result">
           <div className="result-item">
             <span className="result-label">Сумма кредита</span>

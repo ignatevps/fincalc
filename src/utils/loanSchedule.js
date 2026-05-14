@@ -162,5 +162,5 @@ export default function buildSchedule(
       schedule.push({ date: dates[i], payment, interest, body, balance });
     }
   }
-  return { schedule, totalPrepaid, prepaidLog };
+  return { schedule, totalPrepaid, prepaidLog, baseAnnuity };
 }
