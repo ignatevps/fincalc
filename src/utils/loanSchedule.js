@@ -73,12 +73,24 @@ export function calcUniformPayment(amount, rate, issueDate, earlyDate) {
 export default function buildSchedule(
   amount,
   start,
-  dates,
-  baseAnnuity,
   rate,
+  term,
+  termUnit,
   paymentType,
   prepayments = [],
 ) {
+  const dates = [];
+  const r = rate / 12 / 100;
+  const n = termUnit === "years" ? term * 12 : term;
+  const factor = (1 + r) ** n;
+  const baseAnnuity =
+    r === 0 ? amount / n : (amount * r * factor) / (factor - 1);
+
+  for (let i = 1; i <= n; i++) {
+    const d = new Date(start);
+    d.setMonth(d.getMonth() + i);
+    dates.push(d);
+  }
   const schedule = [];
   const prepaidLog = [];
   const allPrepayments = expandPrepayments(prepayments, dates);

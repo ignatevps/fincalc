@@ -26,25 +26,13 @@ export default function Credit() {
   const rateNum = Number(rate);
   const termNum = Number(term);
   const start = new Date(issueDate);
-  const dates = [];
-  const r = rateNum / 12 / 100;
-  const n = termUnit === "years" ? termNum * 12 : termNum;
-  const factor = (1 + r) ** n;
-  const baseAnnuity =
-    r === 0 ? amountNum / n : (amountNum * r * factor) / (factor - 1);
-
-  for (let i = 1; i <= n; i++) {
-    const d = new Date(start);
-    d.setMonth(d.getMonth() + i);
-    dates.push(d);
-  }
 
   const { schedule, totalPrepaid, prepaidLog } = buildSchedule(
     amountNum,
     start,
-    dates,
-    baseAnnuity,
     rateNum,
+    termNum,
+    termUnit,
     paymentType,
     prepayments,
   );
