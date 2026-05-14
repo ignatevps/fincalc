@@ -33,7 +33,8 @@ export default function Mortgage() {
   const r = rateNum / 12 / 100;
   const n = termUnit === "years" ? termNum * 12 : termNum;
   const factor = (1 + r) ** n;
-  const baseAnnuity = (loanAmount * r * factor) / (factor - 1);
+  const baseAnnuity =
+    r === 0 ? loanAmount / n : (loanAmount * r * factor) / (factor - 1);
 
   for (let i = 1; i <= n; i++) {
     const d = new Date(start);
@@ -130,7 +131,7 @@ export default function Mortgage() {
                 setDownPayment(
                   downPaymentUnit === "rub"
                     ? Number(e.target.value.replace(/\D/g, ""))
-                    : e.target.value,
+                    : Number(e.target.value),
                 )
               }
               name="downPayment"
@@ -140,7 +141,10 @@ export default function Mortgage() {
             <select
               name="downPaymentUnit"
               value={downPaymentUnit}
-              onChange={(e) => setDownPaymentUnit(e.target.value)}
+              onChange={(e) => {
+                setDownPaymentUnit(e.target.value);
+                setDownPayment(e.target.value === "percent" ? 20 : 1200000);
+              }}
             >
               <option value="rub">₽</option>
               <option value="percent">%</option>

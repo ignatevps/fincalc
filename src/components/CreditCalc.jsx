@@ -30,7 +30,8 @@ export default function Credit() {
   const r = rateNum / 12 / 100;
   const n = termUnit === "years" ? termNum * 12 : termNum;
   const factor = (1 + r) ** n;
-  const baseAnnuity = (amountNum * r * factor) / (factor - 1);
+  const baseAnnuity =
+    r === 0 ? amountNum / n : (amountNum * r * factor) / (factor - 1);
 
   for (let i = 1; i <= n; i++) {
     const d = new Date(start);
