@@ -1,6 +1,7 @@
 ---
-const { title, description } = Astro.props;
 import '../styles/global.css';
+const { title, description } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
 <html lang="ru">
   <head>
@@ -9,7 +10,14 @@ import '../styles/global.css';
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700&subset=cyrillic&display=swap">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />                                                              
-    <meta name="description" content={description} /> 
+    <meta name="description" content={description} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ru_RU" />
+    <meta property="og:site_name" content="Keeply" />
+    <link rel="canonical" href={canonicalURL} />  
     <title>{title}</title>
   </head>
   <body>
