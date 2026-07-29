@@ -20,7 +20,7 @@ What sets it apart from typical calculators:
 
 ## Stack
 
-Astro · React 19 · JavaScript · Vitest · deployed on Vercel
+Astro · React 19 · JavaScript · Vitest · Docker + Kamal on a VPS
 
 ### Why Astro instead of an SPA
 
@@ -29,6 +29,12 @@ The first version was a Vite + React + React Router SPA. Client-side rendering s
 Astro fixes that without giving up React: every page is prerendered to static HTML at build time, and each calculator ships as an island hydrated on load — so JavaScript is only downloaded where interactivity actually exists.
 
 Calculation logic lives in `src/utils/` as pure, unit-tested functions; React components only handle input and rendering.
+
+### Why a VPS instead of Vercel
+
+The site first went live on Vercel. From Russia — where the entire audience is — it loaded slowly over Wi-Fi and did not load at all on mobile networks, which also makes it unreachable for Yandex's crawler.
+
+It now runs on a Moscow VPS: a multi-stage build (Node compiles the site, nginx serves it, ~26 MB image) deployed with Kamal, sharing kamal-proxy with the main Keeply app, which routes by hostname.
 
 ## Getting started
 
