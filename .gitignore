@@ -17,6 +17,9 @@ pnpm-debug.log*
 .env
 .env.production
 
+# deploy secrets
+.kamal/secrets
+
 # macOS-specific files
 .DS_Store
 

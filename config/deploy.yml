@@ -1,0 +1,33 @@
+# Name of the application. Used to name containers on the server.
+service: fincalc
+
+# Container image name on Docker Hub.
+image: ignatevp/fincalc
+
+# Same VPS that runs Keeply.
+servers:
+  web:
+    - 195.93.252.188
+
+# kamal-proxy routes by hostname: mykeeply.com goes to Rails,
+# calc.mykeeply.com goes to this container.
+proxy:
+  ssl: true
+  host: calc.mykeeply.com
+  app_port: 80
+  healthcheck:
+    path: /
+
+registry:
+  server: registry-1.docker.io
+  username: ignatevp
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+# The Mac is arm64, the server is amd64 — build for the server.
+builder:
+  arch: amd64
+
+ssh:
+  user: ipsru
+  port: 48567
