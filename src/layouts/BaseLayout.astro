@@ -25,6 +25,12 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
   <body>
     <div class="container">
       <slot />
+
+      <footer class="site-footer">
+        Калькуляторы — часть
+        {" "}<a href="https://mykeeply.com/">Keeply</a>, приложения для учёта
+        личных финансов.
+      </footer>
     </div>
   </body>
 </html>

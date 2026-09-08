@@ -48,27 +48,38 @@
   margin: 16px 0 24px;
 }
 
+/* A row, not a box: the wrapper is already a card, and a second rounded box
+   inside it competes with the first instead of reading as part of it. Rows are
+   told apart by a hairline, the way the app's own panels do it. */
 .field {
-  background: #f5f5f5;
-  border: 1px solid #f5f5f5;
-  border-radius: 16px;
-  padding: 10px 14px;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  margin-bottom: 10px;
+  padding: 12px 0 10px;
+  border-bottom: 1px solid var(--border);
 }
 
-.field:hover {
-  border: 1px solid #000;
-}
-
+/* The inputs drop their outline, so without this there is no focus indicator
+   at all — the accent line is what tells a keyboard user where they are. The
+   shadow doubles its thickness without a border change shifting the layout. */
 .field:focus-within {
-  background: #ececec;
+  border-bottom-color: var(--accent);
+  box-shadow: 0 1px 0 var(--accent);
+}
+
+/* The label darkens rather than turning indigo: at 12px the accent lands just
+   under the 4.5:1 contrast a small text needs. */
+.field:focus-within label {
+  color: var(--text-primary);
 }
 
 .calc-form {
   margin-bottom: 24px;
+  margin-top: 10px;
+}
+
+.calc-form > *:last-child {
+  border-bottom: none;
 }
 
 .btn-add {
@@ -91,7 +102,8 @@
   gap: 10px;
   font-size: 14px;
   color: var(--text-secondary);
-  padding: 4px 0;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
   cursor: pointer;
 }
 
@@ -175,13 +187,26 @@
   color: var(--text-primary);
 }
 
+/* The answer gets the fill the fields used to have: the tint now marks a zone
+   instead of decorating every input. Negative margins let it reach the card's
+   edges, so input and answer are two areas rather than one list. */
 .result {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding-top: 20px;
-  margin-top: 16px;
-  position: relative;
+  margin: 0 -32px;
+  padding: 20px 32px;
+  background: #f5f5f5;
+  border-top: 1px solid var(--border);
+}
+
+/* Mortgage and credit render a second block for early repayment, so only the
+   final one reaches the card's bottom edge — otherwise its negative margin
+   would pull the block after it upwards. */
+.calc-wrapper > .result:last-child {
+  margin-bottom: -32px;
+  padding-bottom: 24px;
+  border-radius: 0 0 15px 15px;
 }
 
 .result-wrapper {
@@ -208,21 +233,16 @@
   margin-bottom: 10px;
 }
 
-.result::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: var(--border);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
 .result-item {
   display: flex;
   flex-direction: column;
   gap: 2px;
+}
+
+/* One number per calculator carries the accent: the answer people came for.
+   Everything beside it stays black so there is something to be brightest. */
+.result-item--primary .result-value {
+  color: var(--accent);
 }
 
 .result-label {
@@ -340,8 +360,27 @@
     row-gap: 10px;
   }
 
-  .calc-form .field {
-    margin-bottom: 0;
+  /* Three columns: here a filled cell reads as a cell, and a hairline under
+     each one would only cut the grid up. */
+  .calc-form .field,
+  .calc-form .checkbox-row {
+    background: #f5f5f5;
+    border: 1px solid #f5f5f5;
+    border-radius: 16px;
+    padding: 10px 14px;
+  }
+
+  .calc-form .field:hover,
+  .calc-form .checkbox-row:hover {
+    border-color: #000;
+  }
+
+  /* A cell here is a rounded box, so the underline from the base styles would
+     hang below it — the whole border takes the accent instead. */
+  .calc-form .field:focus-within {
+    background: #ececec;
+    border-color: var(--accent);
+    box-shadow: none;
   }
 
   .field--full {
@@ -358,7 +397,6 @@
     row-gap: 12px;
     column-gap: 60px;
     align-items: center;
-    padding-top: 20px;
   }
 
   .result-value {
@@ -375,4 +413,130 @@
   .result-arrow::before {
     content: "→";
   }
+}
+
+/* Explainer under the calculator */
+.calc-article {
+  max-width: 800px;
+  margin: 48px auto 0;
+  color: var(--text-secondary);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.calc-article h2 {
+  color: var(--text-primary);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 40px 0 12px;
+}
+
+.calc-article h3 {
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 600;
+  margin: 24px 0 8px;
+}
+
+.calc-article p {
+  margin-bottom: 12px;
+}
+
+.calc-article strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.calc-article .formula {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin: 16px 0;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+/* Tables can outgrow a phone; they scroll inside their own box rather than
+   making the whole page slide sideways. */
+.table-scroll {
+  overflow-x: auto;
+  margin: 16px 0;
+}
+
+.calc-article table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.calc-article th {
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 13px;
+  padding: 8px 12px 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.calc-article td {
+  padding: 10px 12px 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.calc-article tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.result-note {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.field-hint {
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
+/* Links are stripped bare globally so a whole card can be one, which leaves
+   links inside prose invisible. Underlined as well as coloured: colour alone
+   is not a signal everyone can see. */
+.calc-article a {
+  color: var(--accent-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+.calc-article a:hover {
+  text-decoration-thickness: 2px;
+}
+
+/* A heading arrived at by anchor should not sit flush against the top edge. */
+.calc-article h2,
+.calc-article h3 {
+  scroll-margin-top: 24px;
+}
+
+.table-note {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* An aside inside the prose: a caveat that qualifies the tables without
+   competing with them for attention. */
+.calc-article .calc-aside {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-muted);
+  border-left: 2px solid var(--border);
+  padding-left: 12px;
+  margin: 16px 0;
 }

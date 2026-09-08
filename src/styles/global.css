@@ -5,6 +5,12 @@
   --text-primary: #1a1a1a;
   --text-secondary: rgba(0, 0, 0, 0.7);
   --text-muted: #888888;
+  /* Keeply's brand indigo. The calculators sit on a subdomain of the same
+     product, so they carry the same accent rather than one of their own. */
+  --accent: #6366f1;
+  /* Darker for text set at body size: the brand indigo lands at 4.47:1 on
+     white, a hair under the 4.5:1 a small text needs. */
+  --accent-text: #4f46e5;
   --radius: 14px;
 }
 
@@ -46,4 +52,21 @@ input[type="month"] {
   .container {
     max-width: 960px;
   }
+}
+
+.site-footer {
+  margin: 56px 0 32px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  font-size: 14px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* Links are stripped bare globally so a whole card can be one; this one is in
+   prose and has to look like a link. */
+.site-footer a {
+  color: var(--accent-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
