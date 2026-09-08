@@ -4,8 +4,17 @@ import buildSchedule, {
   calcEarlyRepayment,
   calcUniformPayment,
 } from "../utils/loanSchedule";
-import { formatNumber, formatCurrency } from "../utils/formatters";
+import {
+  formatNumber,
+  formatCurrency,
+  formatExactCurrency,
+} from "../utils/formatters";
 import PaymentSchedule from "./PaymentSchedule";
+import { averageInflation, presentValue } from "../utils/inflation";
+
+// A long window rather than a short one: a few years would lean on whichever
+// part of the cycle they happened to cover.
+const DEFAULT_INFLATION = averageInflation(20).toFixed(2);
 
 export default function Credit() {
   const [amount, setAmount] = useState(500000);
@@ -20,6 +29,8 @@ export default function Credit() {
   const [showEarlyRepayment, setShowEarlyRepayment] = useState(false);
   const [earlyRepaymentDate, setEarlyRepaymentDate] = useState("");
   const [earlyRepaymentType, setEarlyRepaymentType] = useState("lump_sum");
+  const [useInflation, setUseInflation] = useState(false);
+  const [inflationRate, setInflationRate] = useState(DEFAULT_INFLATION);
   const [showSchedule, setShowSchedule] = useState(false);
 
   const amountNum = Number(amount);
@@ -39,6 +50,19 @@ export default function Credit() {
 
   const totalPayment = schedule.reduce((sum, p) => sum + p.payment, 0);
   const overPayment = totalPayment + totalPrepaid - amountNum;
+
+  // Both the scheduled payments and any prepayments leave the pocket, so both
+  // are discounted back to the issue date.
+  const realOverPayment = useInflation
+    ? presentValue(
+        [
+          ...schedule.map((p) => ({ date: p.date, amount: p.payment })),
+          ...prepaidLog,
+        ],
+        start,
+        Number(inflationRate),
+      ) - amountNum
+    : null;
   const earlyRepaymentResult = (() => {
     if (!showEarlyRepayment || !earlyRepaymentDate) return null;
 
@@ -49,6 +73,7 @@ export default function Credit() {
         earlyRepaymentDate,
         amountNum,
         rateNum,
+        issueDate,
       );
     } else {
       return calcUniformPayment(
@@ -226,6 +251,36 @@ export default function Credit() {
         <label className="checkbox-row">
           <input
             type="checkbox"
+            checked={useInflation}
+            onChange={(e) => setUseInflation(e.target.checked)}
+          />
+          Учитывать инфляцию
+        </label>
+        {useInflation && (
+          <div className="calc-form">
+            <div className="field field--span2">
+              <label htmlFor="inflationRate">Ожидаемая инфляция, % в год</label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                value={inflationRate}
+                onChange={(e) => setInflationRate(e.target.value)}
+                id="inflationRate"
+              />
+              <p className="field-hint">
+                Предположение о будущем, его можно изменить. Средняя за
+                последние 20 лет — {DEFAULT_INFLATION}%.
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="repayment">
+        <label className="checkbox-row">
+          <input
+            type="checkbox"
             checked={showEarlyRepayment}
             onChange={(e) => setShowEarlyRepayment(e.target.checked)}
           />
@@ -269,7 +324,7 @@ export default function Credit() {
       </div>
       {schedule.length > 0 && (
         <div className="result">
-          <div className="result-item">
+          <div className="result-item result-item--primary">
             <span className="result-label">Ежемесячный платёж</span>
             <span className="result-value">
               {paymentType === "annuity" ? (
@@ -294,6 +349,16 @@ export default function Credit() {
             <span className="result-label">Переплата</span>
             <span className="result-value">{formatCurrency(overPayment)}</span>
           </div>
+          {realOverPayment !== null && (
+            <div className="result-item">
+              <span className="result-label">
+                Переплата в сегодняшних деньгах
+              </span>
+              <span className="result-value">
+                {formatCurrency(realOverPayment)}
+              </span>
+            </div>
+          )}
           <button
             className="btn-schedule"
             onClick={() => setShowSchedule(!showSchedule)}
@@ -334,6 +399,16 @@ export default function Credit() {
             )}
         </div>
       )}
+      {showEarlyRepayment &&
+        earlyRepaymentDate &&
+        earlyRepaymentResult === null && (
+          <div className="result">
+            <p className="result-note">
+              До этой даты нет ни одного платежа. Выберите дату не раньше чем
+              через месяц после выдачи — или режим «Погасить одной суммой».
+            </p>
+          </div>
+        )}
       {earlyRepaymentResult !== null && (
         <div className="result">
           <div className="result-item">
@@ -343,7 +418,11 @@ export default function Credit() {
                 : `Сумма для закрытия на ${earlyRepaymentDate}`}
             </span>
             <span className="result-value">
-              {formatCurrency(earlyRepaymentResult.amount)}
+              {/* The payoff is transferred as shown, so it keeps its kopecks;
+                  every other figure here is an estimate and stays rounded. */}
+              {earlyRepaymentType === "uniform"
+                ? formatCurrency(earlyRepaymentResult.amount)
+                : formatExactCurrency(earlyRepaymentResult.amount)}
             </span>
           </div>
           <div className="result-item">

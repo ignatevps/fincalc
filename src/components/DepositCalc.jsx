@@ -44,9 +44,16 @@ export default function Deposit() {
     return year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0) ? 366 : 365;
   }
 
+  // How much of a year the deposit has been open for, on the same basis the
+  // interest itself uses: every period contributes its days over the length of
+  // its own year. Annualising by this makes a plain 14% deposit report exactly
+  // 14%, in a leap year too.
+  let yearFraction = 0;
+
   function calcInterest(i, year, balance) {
     const prevDate = i === 0 ? start : dates[i - 1];
     const days = Math.round((dates[i] - prevDate) / (1000 * 60 * 60 * 24));
+    yearFraction += days / daysInYear(year);
     return ((balance * (rateNum / 100)) / daysInYear(year)) * days;
   }
 
@@ -62,6 +69,7 @@ export default function Deposit() {
     balance +=
       ((amountNum * (rateNum / 100)) / daysInYear(endDate.getFullYear())) *
       totalDays;
+    yearFraction = totalDays / daysInYear(endDate.getFullYear());
     byYear[endDate.getFullYear()] = balance - amountNum;
   } else {
     for (let i = 0; i < dates.length; i++) {
@@ -73,7 +81,8 @@ export default function Deposit() {
 
   const interest = Object.values(byYear).reduce((sum, v) => sum + v, 0);
   const total = amountNum + interest;
-  const effectiveRate = (interest / amountNum / (totalDays / 365.25)) * 100;
+  const effectiveRate =
+    yearFraction > 0 ? (interest / amountNum / yearFraction) * 100 : 0;
 
   return (
     <>
@@ -181,7 +190,7 @@ export default function Deposit() {
             <span className="result-label">Сумма в конце срока</span>
             <span className="result-value">{formatCurrency(total)}</span>
           </div>
-          <div className="result-item">
+          <div className="result-item result-item--primary">
             <span className="result-label">Доход</span>
             <span className="result-value">{formatCurrency(interest)}</span>
           </div>

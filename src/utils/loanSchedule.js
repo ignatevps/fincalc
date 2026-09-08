@@ -31,38 +31,59 @@ export function calcEarlyRepayment(
   earlyDate,
   amount,
   rate,
+  issueDate,
 ) {
-  const row = schedule.findLast((p) => p.date <= new Date(earlyDate));
-  if (!row) return null;
+  const date = new Date(earlyDate);
+  const start = new Date(issueDate);
+  if (date < start) return null;
+
+  const row = schedule.findLast((p) => p.date <= date);
+  // Closing before the first payment is an ordinary case: a loan taken out and
+  // repaid a fortnight later. Nothing has been paid, so the whole amount is
+  // still owed and interest runs from the issue date.
+  const since = row ? row.date : start;
+  const balance = row ? row.balance : amount;
+
   const paidSoFar = schedule
-    .filter((p) => p.date <= new Date(earlyDate))
+    .filter((p) => p.date <= date)
     .reduce((sum, p) => sum + p.payment, 0);
   const prepaidBeforeEarly = prepaidLog
-    .filter((p) => p.date <= new Date(earlyDate))
+    .filter((p) => p.date <= date)
     .reduce((sum, p) => sum + p.amount, 0);
-  const accruedInterest = calcInterestBetween(
-    row.date,
-    new Date(earlyDate),
-    row.balance,
-    rate,
-  );
+  const accruedInterest = calcInterestBetween(since, date, balance, rate);
+  const total = paidSoFar + prepaidBeforeEarly + accruedInterest + balance;
+
+  // Rounded up to the kopeck: this figure is transferred to close the loan, and
+  // rounding it down would leave a few kopecks of debt still accruing interest.
+  const payoff = Math.ceil((balance + accruedInterest) * 100) / 100;
+
   return {
-    amount: row.balance + accruedInterest,
-    total: paidSoFar + prepaidBeforeEarly + accruedInterest + row.balance,
-    overPayment:
-      paidSoFar + prepaidBeforeEarly + accruedInterest + row.balance - amount,
+    amount: payoff,
+    total,
+    overPayment: total - amount,
   };
 }
 
 export function calcUniformPayment(amount, rate, issueDate, earlyDate) {
   const end = new Date(earlyDate);
   const start = new Date(issueDate);
-  const n =
+  let n =
     (end.getFullYear() - start.getFullYear()) * 12 +
     (end.getMonth() - start.getMonth());
+  // Whole months, not calendar ones: a loan issued on the 8th has not run a
+  // month by the 7th of the next. Issued on the 31st, February never reaches
+  // the day at all, so the month does not count — better to say so than to
+  // price a period that has not passed.
+  if (end.getDate() < start.getDate()) n -= 1;
+
+  // Fewer than one whole month leaves nothing to spread: the annuity would
+  // divide by zero and report Infinity. A date before the issue makes n
+  // negative. Neither has a monthly answer — only the lump sum does.
+  if (n < 1) return null;
+
   const r = rate / 12 / 100;
   const f = (1 + r) ** n;
-  const newPayment = (amount * r * f) / (f - 1);
+  const newPayment = r === 0 ? amount / n : (amount * r * f) / (f - 1);
   return {
     amount: newPayment,
     total: newPayment * n,

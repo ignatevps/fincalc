@@ -2,10 +2,17 @@ import cpiData from "../data/cpi.json";
 import { useState } from "react";
 import { formatNumber, formatCurrency } from "../utils/formatters";
 
+// Keys are YYYY-MM with a padded month, so sorting them as strings is already
+// chronological. Computed once here rather than per render: the data is static,
+// and the bounds move on their own whenever cpi.json is topped up.
+const months = Object.keys(cpiData).sort();
+const firstMonth = months[0];
+const lastMonth = months[months.length - 1];
+
 export default function Inflation() {
   const [amount, setAmount] = useState(100000);
   const [periodFrom, setPeriodFrom] = useState("2020-01");
-  const [periodTo, setPeriodTo] = useState("2026-03");
+  const [periodTo, setPeriodTo] = useState(lastMonth);
   const [mode, setMode] = useState("salary");
 
   const numAmount = parseFloat(amount);
@@ -62,8 +69,8 @@ export default function Inflation() {
             type="month"
             name="period_from"
             value={periodFrom}
-            min="1991-01"
-            max="2026-03"
+            min={firstMonth}
+            max={lastMonth}
             id="period_from"
             onChange={(e) => {
               if (e.target.value > periodTo) setPeriodTo("");
@@ -79,7 +86,7 @@ export default function Inflation() {
             name="period_to"
             value={periodTo}
             min={periodFrom}
-            max="2026-03"
+            max={lastMonth}
             id="period_to"
             onChange={(e) => setPeriodTo(e.target.value)}
             required
@@ -109,7 +116,7 @@ export default function Inflation() {
         </div>
       </div>
       <div className="result">
-        <div className="result-item">
+        <div className="result-item result-item--primary">
           <span className="result-label">Инфляция за период</span>
           <span className="result-value">{result.inflation} %</span>
         </div>

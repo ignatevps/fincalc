@@ -3,7 +3,16 @@ import buildSchedule, {
   calcEarlyRepayment,
   calcUniformPayment,
 } from "../utils/loanSchedule";
-import { formatNumber, formatCurrency } from "../utils/formatters";
+import {
+  formatNumber,
+  formatCurrency,
+  formatExactCurrency,
+} from "../utils/formatters";
+import { averageInflation, presentValue } from "../utils/inflation";
+
+// Twenty years of history for a twenty-year loan: a shorter window would
+// lean on whichever part of the cycle it happened to cover.
+const DEFAULT_INFLATION = averageInflation(20).toFixed(2);
 
 export default function Mortgage() {
   const [propertyPrice, setPropertyPrice] = useState(6000000);
@@ -20,6 +29,8 @@ export default function Mortgage() {
   const [showEarlyRepayment, setShowEarlyRepayment] = useState(false);
   const [earlyRepaymentDate, setEarlyRepaymentDate] = useState("");
   const [earlyRepaymentType, setEarlyRepaymentType] = useState("uniform");
+  const [useInflation, setUseInflation] = useState(false);
+  const [inflationRate, setInflationRate] = useState(DEFAULT_INFLATION);
 
   const rateNum = Number(rate);
   const termNum = Number(term);
@@ -42,6 +53,19 @@ export default function Mortgage() {
 
   const totalPayment = schedule.reduce((sum, p) => sum + p.payment, 0);
   const overPayment = totalPayment + totalPrepaid - loanAmount;
+
+  // Both the scheduled payments and any prepayments leave the pocket, so both
+  // are discounted back to the issue date.
+  const realOverPayment = useInflation
+    ? presentValue(
+        [
+          ...schedule.map((p) => ({ date: p.date, amount: p.payment })),
+          ...prepaidLog,
+        ],
+        start,
+        Number(inflationRate),
+      ) - loanAmount
+    : null;
   const earlyRepaymentResult = (() => {
     if (!showEarlyRepayment || !earlyRepaymentDate) return null;
 
@@ -52,6 +76,7 @@ export default function Mortgage() {
         earlyRepaymentDate,
         loanAmount,
         rateNum,
+        issueDate,
       );
     } else {
       return calcUniformPayment(
@@ -262,6 +287,35 @@ export default function Mortgage() {
         <label className="checkbox-row">
           <input
             type="checkbox"
+            checked={useInflation}
+            onChange={(e) => setUseInflation(e.target.checked)}
+          />
+          Учитывать инфляцию
+        </label>
+        {useInflation && (
+          <div className="calc-form">
+            <div className="field field--span2">
+              <label htmlFor="inflationRate">Ожидаемая инфляция, % в год</label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                value={inflationRate}
+                onChange={(e) => setInflationRate(e.target.value)}
+                id="inflationRate"
+              />
+              <p className="field-hint">
+                Средняя за последние 20 лет — {DEFAULT_INFLATION}%.
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="repayment">
+        <label className="checkbox-row">
+          <input
+            type="checkbox"
             checked={showEarlyRepayment}
             onChange={(e) => setShowEarlyRepayment(e.target.checked)}
           />
@@ -314,7 +368,7 @@ export default function Mortgage() {
               ₽
             </span>
           </div>
-          <div className="result-item">
+          <div className="result-item result-item--primary">
             <span className="result-label">Ежемесячный платёж</span>
             <span className="result-value">
               {paymentType === "annuity" ? (
@@ -339,8 +393,28 @@ export default function Mortgage() {
             <span className="result-label">Переплата</span>
             <span className="result-value">{formatCurrency(overPayment)}</span>
           </div>
+          {realOverPayment !== null && (
+            <div className="result-item">
+              <span className="result-label">
+                Переплата в сегодняшних деньгах
+              </span>
+              <span className="result-value">
+                {formatCurrency(realOverPayment)}
+              </span>
+            </div>
+          )}
         </div>
       )}
+      {showEarlyRepayment &&
+        earlyRepaymentDate &&
+        earlyRepaymentResult === null && (
+          <div className="result">
+            <p className="result-note">
+              До этой даты нет ни одного платежа. Выберите дату не раньше чем
+              через месяц после выдачи — или режим «Погасить одной суммой».
+            </p>
+          </div>
+        )}
       {earlyRepaymentResult !== null && (
         <div className="result">
           <div className="result-item">
@@ -350,7 +424,11 @@ export default function Mortgage() {
                 : `Сумма для закрытия на ${earlyRepaymentDate}`}
             </span>
             <span className="result-value">
-              {formatCurrency(earlyRepaymentResult.amount)}
+              {/* The payoff is transferred as shown, so it keeps its kopecks;
+                  every other figure here is an estimate and stays rounded. */}
+              {earlyRepaymentType === "uniform"
+                ? formatCurrency(earlyRepaymentResult.amount)
+                : formatExactCurrency(earlyRepaymentResult.amount)}
             </span>
           </div>
           <div className="result-item">
