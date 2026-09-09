@@ -9,6 +9,42 @@ const months = Object.keys(cpiData).sort();
 const firstMonth = months[0];
 const lastMonth = months[months.length - 1];
 
+// The lists are built from the data itself, so a period without figures behind
+// it cannot be picked at all. A native date input would only have restrained
+// its own picker, and an out-of-range period counted as zero inflation without
+// saying so.
+const years = [...new Set(months.map((key) => key.slice(0, 4)))];
+
+const MONTH_NAMES = [
+  "Январь",
+  "Февраль",
+  "Март",
+  "Апрель",
+  "Май",
+  "Июнь",
+  "Июль",
+  "Август",
+  "Сентябрь",
+  "Октябрь",
+  "Ноябрь",
+  "Декабрь",
+];
+
+// Months available in a given year: the first and last years are partial.
+function monthsIn(year) {
+  return MONTH_NAMES.map((name, i) => ({
+    name,
+    value: String(i + 1).padStart(2, "0"),
+  })).filter(({ value }) => cpiData[`${year}-${value}`]);
+}
+
+// Keeps the pair valid when a year changes under a month that it lacks.
+function clampToData(year, month) {
+  const available = monthsIn(year);
+  if (available.some((m) => m.value === month)) return `${year}-${month}`;
+  return `${year}-${available[available.length - 1].value}`;
+}
+
 export default function Inflation() {
   const [amount, setAmount] = useState(100000);
   const [periodFrom, setPeriodFrom] = useState("2020-01");
@@ -64,33 +100,68 @@ export default function Inflation() {
           />
         </div>
         <div className="field">
-          <label htmlFor="period_from">Начало периода</label>
-          <input
-            type="month"
-            name="period_from"
-            value={periodFrom}
-            min={firstMonth}
-            max={lastMonth}
-            id="period_from"
-            onChange={(e) => {
-              if (e.target.value > periodTo) setPeriodTo("");
-              setPeriodFrom(e.target.value);
-            }}
-            required
-          />
+          <label htmlFor="from_month">Начало периода</label>
+          <div className="field-row">
+            <select
+              id="from_month"
+              value={periodFrom.slice(5)}
+              onChange={(e) =>
+                setPeriodFrom(`${periodFrom.slice(0, 4)}-${e.target.value}`)
+              }
+            >
+              {monthsIn(periodFrom.slice(0, 4)).map(({ name, value }) => (
+                <option key={value} value={value}>
+                  {name}
+                </option>
+              ))}
+            </select>
+            <select
+              className="field-year"
+              aria-label="Год начала периода"
+              value={periodFrom.slice(0, 4)}
+              onChange={(e) =>
+                setPeriodFrom(clampToData(e.target.value, periodFrom.slice(5)))
+              }
+            >
+              {years.map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
         <div className="field">
-          <label htmlFor="period_to">Конец периода</label>
-          <input
-            type="month"
-            name="period_to"
-            value={periodTo}
-            min={periodFrom}
-            max={lastMonth}
-            id="period_to"
-            onChange={(e) => setPeriodTo(e.target.value)}
-            required
-          />
+          <label htmlFor="to_month">Конец периода</label>
+          <div className="field-row">
+            <select
+              id="to_month"
+              value={periodTo.slice(5)}
+              onChange={(e) =>
+                setPeriodTo(`${periodTo.slice(0, 4)}-${e.target.value}`)
+              }
+            >
+              {monthsIn(periodTo.slice(0, 4)).map(({ name, value }) => (
+                <option key={value} value={value}>
+                  {name}
+                </option>
+              ))}
+            </select>
+            <select
+              className="field-year"
+              aria-label="Год конца периода"
+              value={periodTo.slice(0, 4)}
+              onChange={(e) =>
+                setPeriodTo(clampToData(e.target.value, periodTo.slice(5)))
+              }
+            >
+              {years.map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
         <div className="field--full">
           <label className="radio-option">
