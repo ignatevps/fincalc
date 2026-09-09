@@ -22,7 +22,7 @@
 }
 
 .calc-page {
-  padding: 48px 0 32px;
+  padding: 24px 0 32px;
 }
 
 .title {
@@ -34,9 +34,11 @@
   text-align: center;
 }
 
+/* One line of context, not an introduction: the calculator is what people
+   came for and it should not be pushed below the fold. */
 .calc-description {
-  color: #4b4b4b;
-  font-size: 15px;
+  color: var(--text-muted);
+  font-size: 14px;
   max-width: 800px;
   margin: -16px auto 24px;
   line-height: 1.6;
@@ -51,20 +53,28 @@
 /* A row, not a box: the wrapper is already a card, and a second rounded box
    inside it competes with the first instead of reading as part of it. Rows are
    told apart by a hairline, the way the app's own panels do it. */
+/* Label and value share one filled box. The whole of it is workable without a
+   line of script: the label is tied to the input by htmlFor, so tapping the
+   upper half focuses it, and the lower half is the input itself. Radius 8
+   inside the card's 16 reads as nesting; matching 16 read as competing. */
 .field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 12px 0 10px;
-  border-bottom: 1px solid var(--border);
+  gap: 2px;
+  padding: 10px 14px;
+  background: #f5f5f5;
+  border: 1px solid #f5f5f5;
+  border-radius: 8px;
+  margin-bottom: 10px;
 }
 
-/* The inputs drop their outline, so without this there is no focus indicator
-   at all — the accent line is what tells a keyboard user where they are. The
-   shadow doubles its thickness without a border change shifting the layout. */
+.field:hover {
+  border-color: #d8d8d8;
+}
+
 .field:focus-within {
-  border-bottom-color: var(--accent);
-  box-shadow: 0 1px 0 var(--accent);
+  background: #ececec;
+  border-color: var(--accent);
 }
 
 /* The label darkens rather than turning indigo: at 12px the accent lands just
@@ -82,18 +92,26 @@
   border-bottom: none;
 }
 
+/* An action, not an option: it stands among the checkboxes below, so it takes
+   their rhythm — same padding, same hairline — and the accent to say it does
+   something rather than toggles something. */
 .btn-add {
+  display: block;
+  width: 100%;
   background: none;
   border: none;
-  padding: 4px 0;
+  border-bottom: 1px solid var(--border);
+  padding: 14px 0;
   font-size: 14px;
-  color: var(--text-secondary);
+  font-family: inherit;
+  text-align: left;
+  color: var(--accent-text);
   cursor: pointer;
-  margin-bottom: 6px;
 }
 
 .btn-add:hover {
-  color: var(--text-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .checkbox-row {
@@ -112,9 +130,22 @@
   flex-direction: column;
 }
 
+/* The heading and the button that removes this block share a line. */
+.prepayment-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 8px;
+}
+
+.prepayment-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
 .button-right {
-  align-self: flex-end;
-  margin-bottom: 4px;
   background: none;
   border: none;
   color: #e53935;
@@ -136,13 +167,16 @@
   gap: 8px;
 }
 
+/* Transparent inside the box: the box is the field, the input only carries the
+   text. A little vertical padding so there is no dead strip under the label. */
 .field input:not([type="checkbox"]):not([type="radio"]),
 .field select {
   background: transparent;
   border: none;
   font-size: 20px;
+  font-family: inherit;
   color: var(--text-primary);
-  padding: 0;
+  padding: 4px 0 6px;
   outline: none;
   width: 100%;
 }
@@ -151,10 +185,12 @@
   flex: 1;
 }
 
+/* Two controls in one box need a boundary of their own. */
 .field-row select {
-  border-left: 1px solid #ddd;
-  padding: 0 4px;
   width: auto;
+  flex: 0 0 auto;
+  border-left: 1px solid #d8d8d8;
+  padding-left: 10px;
 }
 
 .field--radio {
@@ -239,10 +275,12 @@
   gap: 2px;
 }
 
-/* One number per calculator carries the accent: the answer people came for.
-   Everything beside it stays black so there is something to be brightest. */
+/* One number per calculator carries the accent and the weight: the answer
+   people came for. Everything beside it stays black and lighter, so there is
+   something to be brightest. */
 .result-item--primary .result-value {
   color: var(--accent);
+  font-weight: 700;
 }
 
 .result-label {
@@ -250,15 +288,17 @@
   color: var(--text-muted);
 }
 
+/* Only the answer people came for is bold. The figures beside it are context,
+   and at the same weight they all competed for the same attention. */
 .result-value {
   font-size: 24px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--text-primary);
 }
 
 .result-value-sm {
   font-size: 20px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--text-primary);
 }
 
@@ -358,29 +398,6 @@
     grid-template-columns: repeat(3, 1fr);
     column-gap: 20px;
     row-gap: 10px;
-  }
-
-  /* Three columns: here a filled cell reads as a cell, and a hairline under
-     each one would only cut the grid up. */
-  .calc-form .field,
-  .calc-form .checkbox-row {
-    background: #f5f5f5;
-    border: 1px solid #f5f5f5;
-    border-radius: 16px;
-    padding: 10px 14px;
-  }
-
-  .calc-form .field:hover,
-  .calc-form .checkbox-row:hover {
-    border-color: #000;
-  }
-
-  /* A cell here is a rounded box, so the underline from the base styles would
-     hang below it — the whole border takes the accent instead. */
-  .calc-form .field:focus-within {
-    background: #ececec;
-    border-color: var(--accent);
-    box-shadow: none;
   }
 
   .field--full {

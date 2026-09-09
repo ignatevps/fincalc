@@ -89,7 +89,7 @@ export default function Deposit() {
       <div className="calc-wrapper">
         <div className="calc-form">
           <div className="field">
-            <label htmlFor="amount">Сумма вклада: </label>
+            <label htmlFor="amount">Сумма вклада</label>
             <input
               type="text"
               step="any"
@@ -102,7 +102,7 @@ export default function Deposit() {
             />
           </div>
           <div className="field">
-            <label htmlFor="term">Срок вклада: </label>
+            <label htmlFor="term">Срок</label>
             <div className="field-row">
               <input
                 type="number"
@@ -123,7 +123,7 @@ export default function Deposit() {
             </div>
           </div>
           <div className="field">
-            <label htmlFor="rate">Процентная ставка, % годовых: </label>
+            <label htmlFor="rate">Ставка, % годовых</label>
             <input
               type="number"
               step="0.01"
@@ -134,7 +134,7 @@ export default function Deposit() {
             />
           </div>
           <div className="field">
-            <label htmlFor="openDate">Дата открытия: </label>
+            <label htmlFor="openDate">Дата открытия</label>
             <input
               type="date"
               value={openDate}
@@ -157,12 +157,13 @@ export default function Deposit() {
             Капитализация процентов
           </label>
           <div className="field">
-            <label>
+            <label htmlFor="frequency">
               {withCapitalization
-                ? "Периодичность капитализации:"
-                : "Периодичность выплат:"}
+                ? "Периодичность капитализации"
+                : "Периодичность выплат"}
             </label>
             <select
+              id="frequency"
               name="frequency"
               value={frequency}
               onChange={(e) => setFrequency(e.target.value)}
@@ -186,13 +187,13 @@ export default function Deposit() {
           </div>
         </div>
         <div className="result">
-          <div className="result-item">
-            <span className="result-label">Сумма в конце срока</span>
-            <span className="result-value">{formatCurrency(total)}</span>
-          </div>
           <div className="result-item result-item--primary">
             <span className="result-label">Доход</span>
             <span className="result-value">{formatCurrency(interest)}</span>
+          </div>
+          <div className="result-item">
+            <span className="result-label">Сумма в конце срока</span>
+            <span className="result-value">{formatCurrency(total)}</span>
           </div>
           {withCapitalization && (
             <div className="result-item">

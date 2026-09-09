@@ -115,7 +115,7 @@ export default function Credit() {
     <div className="calc-wrapper">
       <div className="calc-form">
         <div className="field">
-          <label htmlFor="amount">Сумма кредита/займа: </label>
+          <label htmlFor="amount">Сумма кредита</label>
           <input
             type="text"
             step="any"
@@ -129,7 +129,7 @@ export default function Credit() {
           />
         </div>
         <div className="field">
-          <label htmlFor="rate">Процентная ставка, % годовых: </label>
+          <label htmlFor="rate">Ставка, % годовых</label>
           <input
             type="number"
             step="0.1"
@@ -141,7 +141,7 @@ export default function Credit() {
           />
         </div>
         <div className="field">
-          <label htmlFor="term">Срок кредита/займа: </label>
+          <label htmlFor="term">Срок</label>
           <div className="field-row">
             <input
               type="number"
@@ -163,7 +163,7 @@ export default function Credit() {
           </div>
         </div>
         <div className="field">
-          <label htmlFor="issueDate">Дата выдачи: </label>
+          <label htmlFor="issueDate">Дата выдачи</label>
           <input
             type="date"
             value={issueDate}
@@ -174,7 +174,7 @@ export default function Credit() {
           />
         </div>
         <div className="field">
-          <label htmlFor="paymentType">Порядок погашения: </label>
+          <label htmlFor="paymentType">Порядок погашения</label>
           <select
             name="paymentType"
             value={paymentType}
@@ -186,21 +186,28 @@ export default function Credit() {
         </div>
       </div>
       <div className="prepayments">
-        {prepayments.length > 0 && (
-          <h4 className="prepayment-title">Частичное погашение</h4>
-        )}
         {prepayments.map((pp, i) => (
           <div key={i} className="prepayment-row">
-            <button
-              className="button-right"
-              onClick={() => removePrepayment(i)}
-            >
-              ×
-            </button>
+            {/* The heading belongs to its own block, so the button that removes
+                that block sits on the same line as its name. */}
+            <div className="prepayment-header">
+              <h4 className="prepayment-title">
+                Частичное погашение{prepayments.length > 1 ? ` ${i + 1}` : ""}
+              </h4>
+              <button
+                type="button"
+                className="button-right"
+                aria-label="Удалить погашение"
+                onClick={() => removePrepayment(i)}
+              >
+                ×
+              </button>
+            </div>
             <div className="calc-form">
               <div className="field">
-                <label>Сумма</label>
+                <label htmlFor={`pp-amount-${i}`}>Сумма</label>
                 <input
+                  id={`pp-amount-${i}`}
                   type="text"
                   value={formatNumber(pp.amount)}
                   onChange={(e) =>
@@ -213,16 +220,18 @@ export default function Credit() {
                 />
               </div>
               <div className="field">
-                <label>Дата</label>
+                <label htmlFor={`pp-date-${i}`}>Дата</label>
                 <input
+                  id={`pp-date-${i}`}
                   type="date"
                   value={pp.date}
                   onChange={(e) => updatePrepayment(i, "date", e.target.value)}
                 />
               </div>
               <div className="field">
-                <label>Порядок погашения</label>
+                <label htmlFor={`pp-type-${i}`}>Порядок погашения</label>
                 <select
+                  id={`pp-type-${i}`}
                   value={pp.type}
                   onChange={(e) => updatePrepayment(i, "type", e.target.value)}
                 >
@@ -232,13 +241,14 @@ export default function Credit() {
               </div>
               <div className="field field--radio field--full">
                 <input
+                  id={`pp-repeat-${i}`}
                   type="checkbox"
                   checked={pp.repeat}
                   onChange={(e) =>
                     updatePrepayment(i, "repeat", e.target.checked)
                   }
                 />
-                <label>Повторять ежемесячно</label>
+                <label htmlFor={`pp-repeat-${i}`}>Повторять ежемесячно</label>
               </div>
             </div>
           </div>

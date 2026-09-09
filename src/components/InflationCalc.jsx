@@ -50,7 +50,7 @@ export default function Inflation() {
     <div className="calc-wrapper">
       <div className="calc-form">
         <div className="field">
-          <label htmlFor="amount">Сумма: </label>
+          <label htmlFor="amount">Сумма</label>
           <input
             type="text"
             step="any"
@@ -64,7 +64,7 @@ export default function Inflation() {
           />
         </div>
         <div className="field">
-          <label htmlFor="period_from">Начало периода: </label>
+          <label htmlFor="period_from">Начало периода</label>
           <input
             type="month"
             name="period_from"
@@ -80,7 +80,7 @@ export default function Inflation() {
           />
         </div>
         <div className="field">
-          <label htmlFor="period_to">Конец периода: </label>
+          <label htmlFor="period_to">Конец периода</label>
           <input
             type="month"
             name="period_to"

@@ -67,6 +67,9 @@ input[type="month"] {
    prose and has to look like a link. */
 .site-footer a {
   color: var(--accent-text);
+}
+
+.site-footer a:hover {
   text-decoration: underline;
   text-underline-offset: 3px;
 }

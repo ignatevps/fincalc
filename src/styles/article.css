@@ -71,17 +71,16 @@
 }
 
 /* Links are stripped bare globally so a whole card can be one, which leaves
-   links inside prose invisible. Underlined as well as coloured: colour alone
-   is not a signal everyone can see. */
+   links inside prose invisible. Colour at rest, an underline on hover: the
+   accent is kept dark enough to clear 4.5:1 against body text, so it carries
+   the signal on its own. */
 .calc-article a {
   color: var(--accent-text);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-thickness: 1px;
 }
 
 .calc-article a:hover {
-  text-decoration-thickness: 2px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .calc-article h3 {
