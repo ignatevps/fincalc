@@ -1,0 +1,67 @@
+name: Свежесть данных ИПЦ
+
+on:
+  schedule:
+    # Minute, hour, day of month, month, day of week — in UTC.
+    # The 15th, by when Rosstat has published the previous month's index.
+    - cron: "0 9 15 * *"
+  # A button on the Actions tab, so this can be tried without waiting a month.
+  workflow_dispatch:
+
+# The token is read-only by default; issues are all this needs to write.
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      # The runner starts empty. Without this the script would not be there.
+      - uses: actions/checkout@v4
+
+      - id: check
+        run: node scripts/cpi-freshness.mjs
+
+      - name: Open a reminder when the data has fallen behind
+        if: steps.check.outputs.stale == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          LAST: ${{ steps.check.outputs.last }}
+          EXPECTED: ${{ steps.check.outputs.expected }}
+          MISSING: ${{ steps.check.outputs.missing }}
+        run: |
+          # Searching by title, since the issue number is not known in advance.
+          # One standing reminder is enough; a second every month would be noise.
+          count=$(gh issue list --state open \
+            --search 'in:title "Обновить данные ИПЦ"' --json number --jq 'length')
+
+          if [ "$count" -gt 0 ]; then
+            echo "Напоминание уже открыто, второе не заводим"
+            exit 0
+          fi
+
+          gh issue create \
+            --title "Обновить данные ИПЦ: последний месяц $LAST" \
+            --body "Данные в \`src/data/cpi.json\` заканчиваются на $LAST, а Росстат уже опубликовал $EXPECTED. Не хватает месяцев: $MISSING.
+
+          Что сделать:
+
+          1. Взять индексы потребительских цен с сайта Росстата
+          2. Дописать недостающие месяцы в \`src/data/cpi.json\`
+          3. Проверить, не пересчитал ли Росстат прошлые месяцы. Если да — числа в статьях на страницах инфляции и ипотеки посчитаны из этих данных и вписаны в текст, их придётся пересчитать
+          4. Выкатить
+
+          Задача закроется сама при следующей проверке, когда данные станут свежими."
+
+      - name: Close the reminder once the data is fresh again
+        if: steps.check.outputs.stale == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          LAST: ${{ steps.check.outputs.last }}
+        run: |
+          gh issue list --state open \
+            --search 'in:title "Обновить данные ИПЦ"' --json number --jq '.[].number' |
+          while read -r number; do
+            gh issue close "$number" --comment "Данные обновлены до $LAST."
+          done
