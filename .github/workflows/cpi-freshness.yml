@@ -18,7 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # The runner starts empty. Without this the script would not be there.
-      - uses: actions/checkout@v4
+      # Pinned to the major tag: patches arrive on their own, breaking changes
+      # do not.
+      - uses: actions/checkout@v7
 
       - id: check
         run: node scripts/cpi-freshness.mjs
