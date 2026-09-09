@@ -78,6 +78,56 @@ describe("buildSchedule", () => {
   });
 });
 
+describe("prepayments", () => {
+  const amount = 500_000;
+  const start = new Date("2026-09-09");
+  const rate = 19;
+  const plain = buildSchedule(amount, start, rate, 3, "years", "annuity");
+  const plainTotal = plain.schedule.reduce((sum, p) => sum + p.payment, 0);
+
+  it("ignores a prepayment of nothing", () => {
+    for (const type of ["reduce_payment", "reduce_term"]) {
+      const { schedule, totalPrepaid } = buildSchedule(
+        amount,
+        start,
+        rate,
+        3,
+        "years",
+        "annuity",
+        [{ date: "2027-03-09", amount: 0, type, repeat: false }],
+      );
+      const total = schedule.reduce((sum, p) => sum + p.payment, 0);
+
+      expect(totalPrepaid).toBe(0);
+      expect(total).toBeCloseTo(plainTotal, 6);
+    }
+  });
+
+  it("still applies a real one", () => {
+    const { schedule, totalPrepaid } = buildSchedule(
+      amount,
+      start,
+      rate,
+      3,
+      "years",
+      "annuity",
+      [
+        {
+          date: "2027-03-09",
+          amount: 50_000,
+          type: "reduce_payment",
+          repeat: false,
+        },
+      ],
+    );
+    const total =
+      schedule.reduce((sum, p) => sum + p.payment, 0) + totalPrepaid;
+
+    expect(totalPrepaid).toBe(50_000);
+    expect(total).toBeLessThan(plainTotal);
+  });
+});
+
 describe("calcEarlyRepayment", () => {
   const amount = 1_000_000;
   const issueDate = "2026-09-08";

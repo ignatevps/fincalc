@@ -12,6 +12,12 @@ function expandPrepayments(prepayments, dates) {
   const result = [];
 
   for (const pp of prepayments) {
+    // A prepayment of nothing is not an event. Letting it through would still
+    // recompute the annuity, and since interest accrues by actual days while
+    // that formula assumes even months, the payment would shift by a few rubles
+    // without a ruble being paid.
+    if (!(Number(pp.amount) > 0)) continue;
+
     if (!pp.repeat) {
       result.push({ ...pp, date: new Date(pp.date) });
     } else {
