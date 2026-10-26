@@ -25,27 +25,23 @@ jobs:
       - id: check
         run: node scripts/cpi-freshness.mjs
 
-      - name: Open a reminder when the data has fallen behind
+      - name: Open or refresh the reminder when the data has fallen behind
         if: steps.check.outputs.stale == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           LAST: ${{ steps.check.outputs.last }}
           EXPECTED: ${{ steps.check.outputs.expected }}
           MISSING: ${{ steps.check.outputs.missing }}
+          MISSING_MONTHS: ${{ steps.check.outputs.missing_months }}
         run: |
-          # Searching by title, since the issue number is not known in advance.
-          # One standing reminder is enough; a second every month would be noise.
-          count=$(gh issue list --state open \
-            --search 'in:title "Обновить данные ИПЦ"' --json number --jq 'length')
+          # Built before the branch, so that creating and refreshing cannot drift
+          # apart. Backticks are escaped: in an unquoted heredoc they would be
+          # command substitution, and quoting EOF would stop $LAST expanding.
+          title="Обновить данные ИПЦ: последний месяц $LAST"
+          body=$(cat <<EOF
+          Данные в \`src/data/cpi.json\` заканчиваются на $LAST, а Росстат уже опубликовал $EXPECTED.
 
-          if [ "$count" -gt 0 ]; then
-            echo "Напоминание уже открыто, второе не заводим"
-            exit 0
-          fi
-
-          gh issue create \
-            --title "Обновить данные ИПЦ: последний месяц $LAST" \
-            --body "Данные в \`src/data/cpi.json\` заканчиваются на $LAST, а Росстат уже опубликовал $EXPECTED. Не хватает месяцев: $MISSING.
+          Не хватает месяцев: $MISSING — $MISSING_MONTHS.
 
           Что сделать:
 
@@ -54,7 +50,25 @@ jobs:
           3. Проверить, не пересчитал ли Росстат прошлые месяцы. Если да — числа в статьях на страницах инфляции и ипотеки посчитаны из этих данных и вписаны в текст, их придётся пересчитать
           4. Выкатить
 
-          Задача закроется сама при следующей проверке, когда данные станут свежими."
+          Задача закроется сама при следующей проверке, когда данные станут свежими.
+          EOF
+          )
+
+          # Searching by title, since the issue number is not known in advance.
+          # One standing reminder is enough; a second every month would be noise.
+          number=$(gh issue list --state open \
+            --search 'in:title "Обновить данные ИПЦ"' \
+            --json number --jq '.[0].number // empty')
+
+          if [ -n "$number" ]; then
+            # The body is a snapshot of the run that wrote it. Without this a
+            # reminder opened in October would still claim one missing month in
+            # December — a reminder about stale data going stale itself.
+            gh issue edit "$number" --title "$title" --body "$body"
+            echo "Напоминание #$number обновлено"
+          else
+            gh issue create --title "$title" --body "$body"
+          fi
 
       - name: Close the reminder once the data is fresh again
         if: steps.check.outputs.stale == 'false'
