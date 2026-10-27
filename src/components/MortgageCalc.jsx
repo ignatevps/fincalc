@@ -1,10 +1,10 @@
 import { useState } from "react";
+import AmountInput from "./AmountInput";
 import buildSchedule, {
   calcEarlyRepayment,
   calcUniformPayment,
 } from "../utils/loanSchedule";
 import {
-  formatNumber,
   formatCurrency,
   formatExactCurrency,
 } from "../utils/formatters";
@@ -117,13 +117,9 @@ export default function Mortgage() {
       <div className="calc-form">
         <div className="field">
           <label htmlFor="propertyPrice">Стоимость недвижимости</label>
-          <input
-            type="text"
-            step="any"
-            value={formatNumber(propertyPrice)}
-            onChange={(e) =>
-              setPropertyPrice(Number(e.target.value.replace(/\D/g, "")))
-            }
+          <AmountInput
+            value={propertyPrice}
+            onChange={setPropertyPrice}
             name="propertyPrice"
             id="propertyPrice"
             required
@@ -132,25 +128,27 @@ export default function Mortgage() {
         <div className="field">
           <label htmlFor="downPayment">Первоначальный взнос</label>
           <div className="field-row">
-            <input
-              type={downPaymentUnit === "rub" ? "text" : "number"}
-              step="any"
-              value={
-                downPaymentUnit === "rub"
-                  ? formatNumber(downPayment)
-                  : downPayment
-              }
-              onChange={(e) =>
-                setDownPayment(
-                  downPaymentUnit === "rub"
-                    ? Number(e.target.value.replace(/\D/g, ""))
-                    : Number(e.target.value),
-                )
-              }
-              name="downPayment"
-              id="downPayment"
-              required
-            />
+            {/* Rubles get the separators and the caret handling; percent is a
+                small plain number where neither is worth anything. */}
+            {downPaymentUnit === "rub" ? (
+              <AmountInput
+                value={downPayment}
+                onChange={setDownPayment}
+                name="downPayment"
+                id="downPayment"
+                required
+              />
+            ) : (
+              <input
+                type="number"
+                step="any"
+                value={downPayment}
+                onChange={(e) => setDownPayment(Number(e.target.value))}
+                name="downPayment"
+                id="downPayment"
+                required
+              />
+            )}
             <select
               name="downPaymentUnit"
               value={downPaymentUnit}
@@ -242,17 +240,10 @@ export default function Mortgage() {
             <div className="calc-form">
               <div className="field">
                 <label htmlFor={`pp-amount-${i}`}>Сумма</label>
-                <input
+                <AmountInput
                   id={`pp-amount-${i}`}
-                  type="text"
-                  value={formatNumber(pp.amount)}
-                  onChange={(e) =>
-                    updatePrepayment(
-                      i,
-                      "amount",
-                      Number(e.target.value.replace(/\D/g, "")),
-                    )
-                  }
+                  value={pp.amount}
+                  onChange={(next) => updatePrepayment(i, "amount", next)}
                 />
               </div>
               <div className="field">

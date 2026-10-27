@@ -1,6 +1,7 @@
 import cpiData from "../data/cpi.json";
 import { useState } from "react";
-import { formatNumber, formatCurrency } from "../utils/formatters";
+import AmountInput from "./AmountInput";
+import { formatCurrency } from "../utils/formatters";
 
 // Keys are YYYY-MM with a padded month, so sorting them as strings is already
 // chronological. Computed once here rather than per render: the data is static,
@@ -87,13 +88,9 @@ export default function Inflation() {
       <div className="calc-form">
         <div className="field">
           <label htmlFor="amount">Сумма</label>
-          <input
-            type="text"
-            step="any"
-            value={formatNumber(amount)}
-            onChange={(e) =>
-              setAmount(Number(e.target.value.replace(/\D/g, "")))
-            }
+          <AmountInput
+            value={amount}
+            onChange={setAmount}
             name="amount"
             id="amount"
             required

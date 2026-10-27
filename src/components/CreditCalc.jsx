@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
+import AmountInput from "./AmountInput";
 import buildSchedule, {
   calcEarlyRepayment,
   calcUniformPayment,
 } from "../utils/loanSchedule";
 import {
-  formatNumber,
   formatCurrency,
   formatExactCurrency,
 } from "../utils/formatters";
@@ -116,13 +116,9 @@ export default function Credit() {
       <div className="calc-form">
         <div className="field">
           <label htmlFor="amount">Сумма кредита</label>
-          <input
-            type="text"
-            step="any"
-            value={formatNumber(amount)}
-            onChange={(e) =>
-              setAmount(Number(e.target.value.replace(/\D/g, "")))
-            }
+          <AmountInput
+            value={amount}
+            onChange={setAmount}
             name="amount"
             id="amount"
             required
@@ -206,17 +202,10 @@ export default function Credit() {
             <div className="calc-form">
               <div className="field">
                 <label htmlFor={`pp-amount-${i}`}>Сумма</label>
-                <input
+                <AmountInput
                   id={`pp-amount-${i}`}
-                  type="text"
-                  value={formatNumber(pp.amount)}
-                  onChange={(e) =>
-                    updatePrepayment(
-                      i,
-                      "amount",
-                      Number(e.target.value.replace(/\D/g, "")),
-                    )
-                  }
+                  value={pp.amount}
+                  onChange={(next) => updatePrepayment(i, "amount", next)}
                 />
               </div>
               <div className="field">

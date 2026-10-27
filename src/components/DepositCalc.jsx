@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { formatNumber, formatCurrency } from "../utils/formatters";
+import AmountInput from "./AmountInput";
+import { formatCurrency } from "../utils/formatters";
 
 export default function Deposit() {
   const [amount, setAmount] = useState(100000);
@@ -90,16 +91,7 @@ export default function Deposit() {
         <div className="calc-form">
           <div className="field">
             <label htmlFor="amount">Сумма вклада</label>
-            <input
-              type="text"
-              step="any"
-              value={formatNumber(amount)}
-              onChange={(e) =>
-                setAmount(Number(e.target.value.replace(/\D/g, "")))
-              }
-              id="amount"
-              required
-            />
+            <AmountInput value={amount} onChange={setAmount} id="amount" required />
           </div>
           <div className="field">
             <label htmlFor="term">Срок</label>
