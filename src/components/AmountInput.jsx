@@ -1,24 +1,18 @@
-import { useState } from "react";
-import { formatNumber } from "../utils/formatters";
+import { NumericFormat } from "react-number-format";
 
-// Formatting on every keystroke moves the caret to the end: React assigns
-// input.value, and assigning the property resets the selection. So the value is
-// formatted only while the field is not focused — while typing it round-trips
-// unchanged and React leaves the DOM property alone.
-//
-// type="text" with inputMode="numeric" rather than type="number": the numeric
-// keypad without the spinners and the scroll-wheel edits.
+// The separators have to survive typing, which means reformatting on every
+// keystroke — and that moves the caret unless something puts it back. That
+// "something" is the whole job of the library; doing it by hand is a day's
+// work and a long tail of edge cases.
 export default function AmountInput({ value, onChange, ...rest }) {
-  const [focused, setFocused] = useState(false);
-
   return (
-    <input
-      type="text"
+    <NumericFormat
+      value={value}
+      onValueChange={(v) => onChange(v.floatValue ?? 0)}
+      thousandSeparator=" "
+      decimalScale={0}
+      allowNegative={false}
       inputMode="numeric"
-      value={focused ? value : formatNumber(value)}
-      onFocus={() => setFocused(true)}
-      onBlur={() => setFocused(false)}
-      onChange={(e) => onChange(Number(e.target.value.replace(/\D/g, "")))}
       {...rest}
     />
   );
